@@ -12,12 +12,9 @@ public class ConnectionManager {
     private ServerSocket serverSocket;
     private Socket clientSocket;
 
-    private boolean running;
-
     private int port;
 
     public ConnectionManager(int port){
-        running = true;
         this.port = port;
 
         try {
@@ -30,20 +27,20 @@ public class ConnectionManager {
 
     public void run(){
         new Thread( () -> {
-            try {
+            while (true) {
 
-                while (running) {
+                try {
                     clientSocket = serverSocket.accept();
+                } catch (IOException e){
+                    e.printStackTrace();
                 }
 
-            } catch (IOException e){
-                e.printStackTrace();
             }
         }).start();
     }
 
-    public void stop(){
-        running = false;
+    public void stop() throws IOException {
+        clientSocket.close();
     }
 
     public int getPort(){

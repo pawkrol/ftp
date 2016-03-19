@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -46,7 +47,13 @@ public class Controller implements Initializable{
                 portLabel.setText("" + connectionManager.getPort());
             } else {
                 serverLogger.log("Server stopped");
-                connectionManager.stop();
+
+                try {
+                    connectionManager.stop();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 button.setText("Start");
 
                 portLabel.setText("null");
