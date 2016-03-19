@@ -9,9 +9,9 @@
 
 <AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="400.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.server.Controller">
   <children>
-    <TextArea fx:id="logger" editable="false" layoutX="10.0" layoutY="50.0" prefHeight="140.0" prefWidth="380.0" wrapText="true" />
       <Button fx:id="button" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClickButton" text="Start" />
-      <Label layoutX="80.0" layoutY="19.0" text="Server at port: " />
-      <Label fx:id="portLabel" layoutX="180.0" layoutY="19.0" text="null" />
+      <Label layoutX="261.0" layoutY="19.0" text="Server at port: " />
+      <Label fx:id="portLabel" layoutX="366.0" layoutY="19.0" text="null" />
+      <ListView fx:id="logger" layoutX="10.0" layoutY="50.0" prefHeight="140.0" prefWidth="380.0" />
   </children>
 </AnchorPane>

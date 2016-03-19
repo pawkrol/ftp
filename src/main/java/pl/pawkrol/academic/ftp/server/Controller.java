@@ -5,7 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ListView;
+
 import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class Controller implements Initializable{
     Button button;
 
     @FXML
-    TextArea logger; //TODO: change
+    ListView<String> logger;
 
     @FXML
     Label portLabel;
@@ -41,6 +42,7 @@ public class Controller implements Initializable{
         if (connectionManager != null){
             if (button.getText().equals("Start")) {
                 serverLogger.log("Server started");
+
                 connectionManager.run();
                 button.setText("Stop");
 
@@ -49,7 +51,7 @@ public class Controller implements Initializable{
                 serverLogger.log("Server stopped");
 
                 try {
-                    connectionManager.stop();
+                    connectionManager.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
