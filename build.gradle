@@ -7,7 +7,7 @@ version = '1.0'
 idea{
     module{
         sourceDirs += file('src/main/java')
-        testSourceDirs += file('test/java')
+        testSourceDirs += file('src/test/java')
 
         inheritOutputDirs = false
         outputDir = file('bin')
