@@ -1,6 +1,10 @@
 package pl.pawkrol.academic.ftp.server.command;
 
-import java.io.IOException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -11,6 +15,7 @@ import java.util.Scanner;
  */
 public class CommandHandler implements Runnable{
 
+    private static final Logger log = LogManager.getLogger("logger");
     private final Socket socket;
 
     private int timeout;
@@ -31,9 +36,15 @@ public class CommandHandler implements Runnable{
         try {
             socket.setSoTimeout(timeout * 1000);
 
-            Scanner scanner = new Scanner(socket.getInputStream());
-            while (running && scanner.hasNext()){
+            log.log(Level.INFO, "Connection from: "
+                    + socket.getInetAddress().getCanonicalHostName());
 
+            Scanner scanner = new Scanner(socket.getInputStream());
+            while (running && scanner.hasNext() && (!Thread.currentThread().isInterrupted())){
+                System.out.print(scanner.nextLine());
+                OutputStream os = socket.getOutputStream();
+                os.write("ok\n".getBytes());
+                os.flush();
             }
 
             handleClose();
@@ -48,10 +59,12 @@ public class CommandHandler implements Runnable{
     }
 
     private void handleClose(){
-
+        log.log(Level.INFO, "End of onnection from: "
+                + socket.getInetAddress().getCanonicalHostName());
     }
 
     private void onTimeout(){
+        log.log(Level.WARN, "Timeout terminating...");
         handleClose();
     }
 }

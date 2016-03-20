@@ -5,6 +5,7 @@ import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,6 +53,9 @@ public class ConnectionManager {
                 && !serverSocket.isClosed()) {
             serverSocket.close();
         }
+
+        executorService.shutdown();
+        executorService.shutdownNow();
     }
 
     public int getPort(){

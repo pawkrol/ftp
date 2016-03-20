@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration packages="pl.pawkrol.academic.ftp.server">
+    <Appenders>
+        <ListViewAppender name="logger">
+            <PatternLayout pattern="[%d{HH:mm:ss}]    %m"/>
+        </ListViewAppender>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="logger"/>
+        </Root>
+    </Loggers>
+</Configuration>

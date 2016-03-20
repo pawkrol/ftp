@@ -7,6 +7,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 
 import java.io.IOException;
@@ -16,7 +19,7 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable{
 
     private ConnectionManager connectionManager;
-    private ServerLogger serverLogger;
+    private static final Logger log = LogManager.getLogger("logger");
 
     @FXML
     Button button;
@@ -29,8 +32,7 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        serverLogger = new ServerLogger(logger);
+        ListViewAppender.setListView(logger);
     }
 
     public void setConnectionManager(ConnectionManager connectionManager){
@@ -38,26 +40,19 @@ public class Controller implements Initializable{
     }
 
     @FXML
-    private void onClickButton(ActionEvent actionEvent){
+    private void onClickButton(ActionEvent actionEvent) throws IOException{
         if (connectionManager != null){
             if (button.getText().equals("Start")) {
-                serverLogger.log("Server started");
-
                 connectionManager.run();
-                button.setText("Stop");
 
+                log.log(Level.INFO, "Server started");
+                button.setText("Stop");
                 portLabel.setText("" + connectionManager.getPort());
             } else {
-                serverLogger.log("Server stopped");
+                connectionManager.close();
 
-                try {
-                    connectionManager.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                log.log(Level.INFO, "Server stopped");
                 button.setText("Start");
-
                 portLabel.setText("null");
             }
         }
