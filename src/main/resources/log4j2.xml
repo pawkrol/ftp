@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration packages="pl.pawkrol.academic.ftp.server">
+<Configuration packages="pl.pawkrol.academic.ftp.server.utils">
     <Appenders>
         <ListViewAppender name="logger">
             <PatternLayout pattern="[%d{HH:mm:ss}]    %m"/>

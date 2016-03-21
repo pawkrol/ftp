@@ -27,10 +27,6 @@ public class CommandHandler implements Runnable{
         this.timeout = 60; //seconds
     }
 
-    public void close(){
-        running = false;
-    }
-
     @Override
     public void run(){
         try {
@@ -56,6 +52,10 @@ public class CommandHandler implements Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void close(){
+        running = false;
     }
 
     private void handleClose(){

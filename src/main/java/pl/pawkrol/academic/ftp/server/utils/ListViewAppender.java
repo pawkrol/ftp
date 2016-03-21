@@ -1,9 +1,11 @@
-package pl.pawkrol.academic.ftp.server;
+package pl.pawkrol.academic.ftp.server.utils;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -15,12 +17,9 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.LogRecord;
 
 /**
  * Created by pawkrol on 3/7/16.
@@ -34,8 +33,8 @@ import java.util.logging.LogRecord;
 )
 public final class ListViewAppender extends AbstractAppender{
 
-    private static ListView<String> listView;
-    private static ObservableList<String> logs = FXCollections.observableArrayList();
+    private static ListView<LogWrapper> listView;
+    private static ObservableList<LogWrapper> logs = FXCollections.observableArrayList();
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
@@ -50,14 +49,23 @@ public final class ListViewAppender extends AbstractAppender{
     public void append(LogEvent event) {
         readLock.lock();
 
-        final String message = new String(getLayout().toByteArray(event));
+        final LogWrapper message = new LogWrapper(
+                new String(getLayout().toByteArray(event)),
+                event.getLevel()
+        );
 
         try {
             Platform.runLater(() -> {
                 if (listView != null){
+
+                    if (logs.size() > 1) {
+                        listView.scrollTo(logs.size() - 1);
+                    }
+
                     logs.add(message);
                     listView.setItems(logs);
-                    listView.scrollTo(logs.size());
+
+                    listView.setCellFactory(param -> new CellTextColor());
                 }
             });
         } catch (IllegalStateException e){
@@ -85,7 +93,26 @@ public final class ListViewAppender extends AbstractAppender{
         return new ListViewAppender(name, filter, layout, true);
     }
 
-    public static void setListView(ListView<String> listView) {
+    public static void setListView(ListView<LogWrapper> listView) {
         ListViewAppender.listView = listView;
+    }
+
+    private static class CellTextColor extends ListCell<LogWrapper>{
+        @Override
+        protected void updateItem(LogWrapper item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item != null && !empty) {
+                setText(item.getMessage());
+
+                if (item.getLevel() == Level.WARN){
+                    setStyle("-fx-text-fill: orange");
+                } else if (item.getLevel() == Level.DEBUG){
+                    setStyle("-fx-text-fill: grey");
+                } else if (item.getLevel() == Level.ERROR
+                        || item.getLevel() == Level.FATAL){
+                    setStyle("-fx-text-fill: red");
+                }
+            }
+        }
     }
 }
