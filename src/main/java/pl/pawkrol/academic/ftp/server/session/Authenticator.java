@@ -1,5 +1,6 @@
 package pl.pawkrol.academic.ftp.server.session;
 
+import pl.pawkrol.academic.ftp.server.db.User;
 import pl.pawkrol.academic.ftp.server.db.UserRepository;
 
 /**
@@ -13,8 +14,8 @@ public class Authenticator {
         this.userRepository = userRepository;
     }
 
-    public synchronized boolean authenticate(String username, String password){
-        return true;
+    public synchronized boolean authenticate(User user){
+        return userRepository.authenticate(user) != null;
     }
 
 }

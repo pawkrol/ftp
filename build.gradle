@@ -22,5 +22,6 @@ repositories {
 dependencies {
     compile ('org.apache.logging.log4j:log4j-api:2.5')
     compile ('org.apache.logging.log4j:log4j-core:2.5')
+    compile ('mysql:mysql-connector-java:5.1.38')
     testCompile('junit:junit:4.12')
 }

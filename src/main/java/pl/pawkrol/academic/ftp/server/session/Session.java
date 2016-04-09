@@ -26,7 +26,7 @@ public class Session {
     }
 
     public boolean authenticate(){
-        if (authenticator.authenticate(user.getUsername(), user.getPassword())){
+        if (authenticator.authenticate(user)){
 
             state = State.AUTHENTICATED;
             return true;

@@ -1,7 +1,6 @@
 package pl.pawkrol.academic.ftp.server.connection;
 
 import pl.pawkrol.academic.ftp.server.command.CommandHandler;
-import pl.pawkrol.academic.ftp.server.db.UserRepository;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
 import java.io.IOException;

@@ -26,6 +26,7 @@ public class PASSCommand extends Command {
 
         session.getUser().setPassword(params[0]);
         if (session.authenticate()){
+            session.state = Session.State.AUTHENTICATED;
             return new Response(230, "Logged in.");
         } else {
             return new Response(430, "Invalid username or password.");
