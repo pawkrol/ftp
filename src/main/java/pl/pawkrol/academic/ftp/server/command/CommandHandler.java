@@ -3,12 +3,12 @@ package pl.pawkrol.academic.ftp.server.command;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.pawkrol.academic.ftp.server.connection.Response;
+import pl.pawkrol.academic.ftp.server.session.Session;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Scanner;
 
 /**
  * Created by Pawel on 2016-03-19.
@@ -17,14 +17,20 @@ public class CommandHandler implements Runnable{
 
     private static final Logger log = LogManager.getLogger("logger");
     private final Socket socket;
+    private final Session session;
+    private final CommandDispatcher commandDispatcher;
+
+    private OutputStream clientOutputStream;
 
     private int timeout;
     private boolean running;
 
-    public CommandHandler(Socket socket) {
+    public CommandHandler(Session session, Socket socket) {
+        this.session = session;
         this.socket = socket;
         this.running = true;
         this.timeout = 60; //seconds
+        this.commandDispatcher = new CommandDispatcher(session);
     }
 
     @Override
@@ -35,22 +41,26 @@ public class CommandHandler implements Runnable{
             log.log(Level.INFO, "Connection from: "
                     + socket.getInetAddress().getCanonicalHostName());
 
-            Scanner scanner = new Scanner(socket.getInputStream());
-            while (running && scanner.hasNext() && (!Thread.currentThread().isInterrupted())){
-                System.out.print(scanner.nextLine());
-                OutputStream os = socket.getOutputStream();
-                os.write("ok\n".getBytes());
-                os.flush();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+
+            clientOutputStream = socket.getOutputStream();
+            sendResponse(new Response(220, "Server ready."));
+
+            String command;
+            while (running && (command = reader.readLine()) != null
+                    && (!Thread.currentThread().isInterrupted())){
+                sendResponse(commandDispatcher.dispatch(command));
             }
 
             handleClose();
 
         } catch (SocketTimeoutException e){
             onTimeout();
-        } catch (SocketException e){
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            handleClose();
         }
     }
 
@@ -58,13 +68,36 @@ public class CommandHandler implements Runnable{
         running = false;
     }
 
-    private void handleClose(){
-        log.log(Level.INFO, "End of onnection from: "
-                + socket.getInetAddress().getCanonicalHostName());
+    public void kill() throws IOException { //try it all
+        socket.close();
+        close();
+        Thread.currentThread().interrupt();
     }
 
-    private void onTimeout(){
+    private void sendResponse(Response response) throws IOException {
+        clientOutputStream.write(response.toString().getBytes());
+        clientOutputStream.flush();
+    }
+
+    private void handleClose() {
+        log.log(Level.INFO, "End of connection from: "
+                + socket.getInetAddress().getCanonicalHostName());
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onTimeout() {
         log.log(Level.WARN, "Timeout terminating...");
+
+        try {
+            sendResponse(new Response(426, "Timeout termination after " + timeout + " seconds."));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         handleClose();
     }
 }

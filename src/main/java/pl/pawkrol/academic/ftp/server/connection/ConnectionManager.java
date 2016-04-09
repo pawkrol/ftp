@@ -1,11 +1,11 @@
 package pl.pawkrol.academic.ftp.server.connection;
 
 import pl.pawkrol.academic.ftp.server.command.CommandHandler;
+import pl.pawkrol.academic.ftp.server.db.UserRepository;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,19 +22,22 @@ public class ConnectionManager {
     private ServerSocket serverSocket;
 
     public ConnectionManager(SessionManager sessionManager, int port, int pool){
-        this.executorService = Executors.newFixedThreadPool(pool);
         this.sessionManager = sessionManager;
         this.port = port;
         this.pool = pool;
     }
 
     public void run(){
+        executorService = Executors.newFixedThreadPool(pool);
+
         try {
             serverSocket = new ServerSocket(port);
             new Thread(() -> {
                 while (true) {
                     try {
-                        executorService.execute(new CommandHandler(serverSocket.accept()));
+                        executorService.execute(
+                                new CommandHandler(sessionManager.createSession(), serverSocket.accept())
+                        );
                     } catch (IOException e) {
                         //  will be thrown on socket close
                     }
@@ -62,4 +65,7 @@ public class ConnectionManager {
         return port;
     }
 
+    public int getPool() {
+        return pool;
+    }
 }
