@@ -1,10 +1,13 @@
-package pl.pawkrol.academic.ftp.server.command;
+package pl.pawkrol.academic.ftp.server.connection;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.pawkrol.academic.ftp.server.command.CommandDispatcher;
+import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.server.connection.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
+import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,18 +22,21 @@ public class CommandHandler implements Runnable{
     private final Socket socket;
     private final Session session;
     private final CommandDispatcher commandDispatcher;
+    private final ConnectionManager connectionManager;
 
     private OutputStream clientOutputStream;
 
     private int timeout;
     private boolean running;
 
-    public CommandHandler(Session session, Socket socket) {
-        this.session = session;
+    public CommandHandler(ConnectionManager connectionManager, SessionManager sessionManager,
+                          Socket socket) {
+        this.session = sessionManager.createSession(this);
         this.socket = socket;
         this.running = true;
         this.timeout = 60; //seconds
         this.commandDispatcher = new CommandDispatcher(session);
+        this.connectionManager = connectionManager;
     }
 
     @Override

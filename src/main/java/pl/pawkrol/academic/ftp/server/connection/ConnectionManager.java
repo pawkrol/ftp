@@ -1,6 +1,6 @@
 package pl.pawkrol.academic.ftp.server.connection;
 
-import pl.pawkrol.academic.ftp.server.command.CommandHandler;
+import pl.pawkrol.academic.ftp.server.session.Session;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
 import java.io.IOException;
@@ -20,8 +20,8 @@ public class ConnectionManager {
     private ExecutorService executorService;
     private ServerSocket serverSocket;
 
-    public ConnectionManager(SessionManager sessionManager, int port, int pool){
-        this.sessionManager = sessionManager;
+    public ConnectionManager(int port, int pool){
+        this.sessionManager = new SessionManager(this);
         this.port = port;
         this.pool = pool;
     }
@@ -35,7 +35,7 @@ public class ConnectionManager {
                 while (true) {
                     try {
                         executorService.execute(
-                                new CommandHandler(sessionManager.createSession(), serverSocket.accept())
+                                new CommandHandler(this, sessionManager, serverSocket.accept())
                         );
                     } catch (IOException e) {
                         //  will be thrown on socket close
@@ -58,6 +58,21 @@ public class ConnectionManager {
 
         executorService.shutdown();
         executorService.shutdownNow();
+    }
+
+    public DataHandler obtainDataHandler(Session session){
+        switch (session.mode) {
+            case UNKNOWN:
+                return null;
+
+            case PASSIVE:
+                return new PassiveDataHandler(session, serverSocket.getInetAddress());
+
+            case ACTIVE:
+                return null;
+        }
+
+        return null;
     }
 
     public int getPort(){

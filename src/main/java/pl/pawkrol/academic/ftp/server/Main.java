@@ -12,7 +12,6 @@ import pl.pawkrol.academic.ftp.server.session.SessionManager;
 public class Main extends Application {
 
     private ConnectionManager connectionManager;
-    private SessionManager sessionManager;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -20,8 +19,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load(getClass().getResource("/layout.fxml").openStream());
         Controller controller = fxmlLoader.getController();
 
-        sessionManager = new SessionManager();
-        connectionManager = new ConnectionManager(sessionManager, 2121, 4);
+        connectionManager = new ConnectionManager(2121, 4);
         controller.setConnectionManager(connectionManager);
 
         primaryStage.setTitle("FTPer Server");

@@ -30,8 +30,8 @@ public class CommandDispatcher {
             return new Response(501, "Unknown command " + params[0] + ".");
         }
 
-        if (!params[0].equals("USER") && session.getState() != Session.State.AUTHENTICATING
-                                        && session.getState() == Session.State.NOT_AUTHENTICATED){
+        if ( !( params[0].equals("USER") || params[0].equals("PASS") || params[0].equals("QUIT") )
+                                        && (session.getState() == Session.State.NOT_AUTHENTICATED) ){
             return new Response(332, "Need account/unauthorized.");
         }
 
@@ -45,6 +45,8 @@ public class CommandDispatcher {
     private void registerCommands(){
         commands.put("USER", new USERCommand(session));
         commands.put("PASS", new PASSCommand(session));
+        commands.put("QUIT", new QUITCommand(session));
+        commands.put("PASV", new PASVCommand(session));
     }
 
 }

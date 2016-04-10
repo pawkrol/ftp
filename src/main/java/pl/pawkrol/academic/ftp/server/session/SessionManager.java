@@ -1,5 +1,7 @@
 package pl.pawkrol.academic.ftp.server.session;
 
+import pl.pawkrol.academic.ftp.server.connection.CommandHandler;
+import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.server.db.UserRepository;
 
 import java.util.ArrayList;
@@ -14,16 +16,19 @@ public class SessionManager {
 
     private final Authenticator authenticator;
     private final UserRepository userRepository;
+    private final ConnectionManager connectionManager;
+
     private List<Session> sessions;
 
-    public SessionManager(){
+    public SessionManager(ConnectionManager connectionManager){
         this.userRepository = new UserRepository();
+        this.connectionManager = connectionManager;
         this.authenticator = new Authenticator(userRepository);
         this.sessions = new ArrayList<>();
     }
 
-    public synchronized Session createSession(){
-        Session session = new Session(authenticator, id++);
+    public synchronized Session createSession(CommandHandler commandHandler){
+        Session session = new Session(this, commandHandler, connectionManager, authenticator, id++);
         sessions.add(session);
         return session;
     }

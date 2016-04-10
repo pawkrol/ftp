@@ -9,8 +9,7 @@ import pl.pawkrol.academic.ftp.server.session.Session;
 public class USERCommand extends Command {
 
     USERCommand(Session session){
-        this.session = session;
-        this.paramsNumber = 1;
+        super(session, 1);
     }
 
     @Override
@@ -25,7 +24,6 @@ public class USERCommand extends Command {
         }
 
         session.getUser().setUsername(params[0]);
-        session.state = Session.State.AUTHENTICATING;
 
         return new Response(331, "Please identify yourself in a password.");
     }

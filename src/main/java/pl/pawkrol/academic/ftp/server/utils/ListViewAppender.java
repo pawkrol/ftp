@@ -107,7 +107,7 @@ public final class ListViewAppender extends AbstractAppender{
                 if (item.getLevel() == Level.WARN){
                     setStyle("-fx-text-fill: orange");
                 } else if (item.getLevel() == Level.DEBUG){
-                    setStyle("-fx-text-fill: grey");
+                    setStyle("-fx-text-fill: slategrey");
                 } else if (item.getLevel() == Level.ERROR
                         || item.getLevel() == Level.FATAL){
                     setStyle("-fx-text-fill: red");

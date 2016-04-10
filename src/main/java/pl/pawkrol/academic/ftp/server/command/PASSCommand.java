@@ -1,5 +1,6 @@
 package pl.pawkrol.academic.ftp.server.command;
 
+import org.apache.logging.log4j.Level;
 import pl.pawkrol.academic.ftp.server.connection.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
@@ -9,8 +10,7 @@ import pl.pawkrol.academic.ftp.server.session.Session;
 public class PASSCommand extends Command {
 
     PASSCommand(Session session){
-        this.session = session;
-        this.paramsNumber = 1;
+        super(session, 1);
     }
 
     @Override
@@ -26,6 +26,9 @@ public class PASSCommand extends Command {
 
         session.getUser().setPassword(params[0]);
         if (session.authenticate()){
+
+            log.log(Level.INFO, session.getUser().toString() + " logged in");
+
             session.state = Session.State.AUTHENTICATED;
             return new Response(230, "Logged in.");
         } else {
