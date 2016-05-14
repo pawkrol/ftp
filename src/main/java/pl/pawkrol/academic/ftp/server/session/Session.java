@@ -1,10 +1,8 @@
 package pl.pawkrol.academic.ftp.server.session;
 
-import pl.pawkrol.academic.ftp.server.connection.CommandHandler;
-import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
-import pl.pawkrol.academic.ftp.server.connection.DataHandler;
-import pl.pawkrol.academic.ftp.server.connection.PassiveDataHandler;
+import pl.pawkrol.academic.ftp.server.connection.*;
 import pl.pawkrol.academic.ftp.server.db.User;
+import pl.pawkrol.academic.ftp.server.filesystem.FileManager;
 
 /**
  * Created by Pawel on 2016-03-19.
@@ -25,6 +23,7 @@ public class Session {
     private final SessionManager sessionManager;
     private final ConnectionManager connectionManager;
     private final CommandHandler commandHandler;
+    private final FileManager fileManager;
 
     private DataHandler dataHandler;
 
@@ -33,11 +32,13 @@ public class Session {
 
     public Session(SessionManager sessionManager, CommandHandler commandHandler,
                    ConnectionManager connectionManager,
-                   Authenticator authenticator, int id) {
+                   Authenticator authenticator, int id,
+                   FileManager fileManager) {
 
         this.sessionManager = sessionManager;
         this.commandHandler = commandHandler;
         this.connectionManager = connectionManager;
+        this.fileManager = fileManager;
         this.authenticator = authenticator;
         this.id = id;
 
@@ -61,6 +62,10 @@ public class Session {
             commandHandler.close();
         }
 
+        if (dataHandler != null){
+            dataHandler.close();
+        }
+
         sessionManager.removeSession(this);
     }
 
@@ -70,13 +75,20 @@ public class Session {
         }
 
         dataHandler = connectionManager.obtainDataHandler(this);
-        dataHandler.run();
 
         return (PassiveDataHandler) dataHandler;
     }
 
     public DataHandler getDataHandler() {
         return dataHandler;
+    }
+
+    public CommandHandler getCommandHandler() {
+        return commandHandler;
+    }
+
+    public FileManager getFileManager() {
+        return fileManager;
     }
 
     public int getId() {

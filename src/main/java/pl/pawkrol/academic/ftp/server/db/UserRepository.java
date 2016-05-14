@@ -7,41 +7,64 @@ import java.sql.*;
  */
 public class UserRepository {
 
-    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://192.168.0.19/ftp";
+    private DBConnector dbConnector;
 
-    static final String USERNAME = "ftp-server";
-    static final String PASSWORD = "ftp-password";
-
-    private Connection connection;
-    private Statement statement;
-
-    public UserRepository(){
-        try {
-            Class.forName(JDBC_DRIVER);
-
-            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            statement = connection.createStatement();
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+    public UserRepository(DBConnector dbConnector){
+        this.dbConnector = dbConnector;
     }
 
-    public synchronized User authenticate(User user){
+    public synchronized User authenticate(User user) throws SQLException {
+        Connection connection = dbConnector.makeConnection();
+        Statement statement = connection.createStatement();
+
+        User returnUser = null;
+
         try {
             String query = "SELECT * FROM users WHERE username = \"" + user.getUsername() + "\"";
 
             ResultSet resultSet = statement.executeQuery(query);
 
-            if (resultSet.next() && resultSet.getString("password").equals(user.getPassword())){
-                return user;
+            if (resultSet.next()
+                    && resultSet.getString("password").equals(user.getPassword())){
+                user.setUserId(resultSet.getInt("id"));
+                returnUser = user;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            statement.close();
+            connection.close();
         }
-        return null;
+
+        return returnUser;
+    }
+
+    public synchronized User getUserById(int id) throws SQLException {
+        Connection connection = dbConnector.makeConnection();
+        Statement statement = connection.createStatement();
+
+        User user = null;
+
+        try {
+            String query = "SELECT * FROM users WHERE id = \"" + id + "\"";
+
+            ResultSet resultSet = statement.executeQuery(query);
+
+            if (resultSet.next()){
+                user = new User(resultSet.getInt("id"), resultSet.getString("username"),
+                                resultSet.getString("password"));
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            statement.close();
+            connection.close();
+        }
+
+        return user;
     }
 
 }

@@ -7,7 +7,8 @@ import pl.pawkrol.academic.ftp.server.session.Session;
  */
 public abstract class DataHandler implements Runnable{
 
-    private final Session session;
+    protected final Session session;
+    protected DataProcessor dataProcessor;
 
     public DataHandler(Session session){
         this.session = session;
@@ -15,6 +16,10 @@ public abstract class DataHandler implements Runnable{
 
     @Override
     public void run() {}
+
+    public void setDataProcessor(DataProcessor dataProcessor) {
+        this.dataProcessor = dataProcessor;
+    }
 
     public void close() {}
 }

@@ -47,6 +47,8 @@ public class CommandDispatcher {
         commands.put("PASS", new PASSCommand(session));
         commands.put("QUIT", new QUITCommand(session));
         commands.put("PASV", new PASVCommand(session));
+        commands.put("RETR", new RETRCommand(session));
+        commands.put("PWD", new PWDCommand(session));
     }
 
 }

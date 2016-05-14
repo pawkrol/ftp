@@ -111,6 +111,8 @@ public final class ListViewAppender extends AbstractAppender{
                 } else if (item.getLevel() == Level.ERROR
                         || item.getLevel() == Level.FATAL){
                     setStyle("-fx-text-fill: red");
+                } else {
+                    setStyle("-fx-text-fill: black");
                 }
             }
         }

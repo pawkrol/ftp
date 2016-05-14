@@ -1,5 +1,7 @@
 package pl.pawkrol.academic.ftp.server.connection;
 
+import pl.pawkrol.academic.ftp.server.db.DBConnector;
+import pl.pawkrol.academic.ftp.server.filesystem.FileManager;
 import pl.pawkrol.academic.ftp.server.session.Session;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
@@ -20,8 +22,8 @@ public class ConnectionManager {
     private ExecutorService executorService;
     private ServerSocket serverSocket;
 
-    public ConnectionManager(int port, int pool){
-        this.sessionManager = new SessionManager(this);
+    public ConnectionManager(int port, int pool, DBConnector dbConnector){
+        this.sessionManager = new SessionManager(this, dbConnector);
         this.port = port;
         this.pool = pool;
     }
@@ -66,7 +68,9 @@ public class ConnectionManager {
                 return null;
 
             case PASSIVE:
-                return new PassiveDataHandler(session, serverSocket.getInetAddress());
+                PassiveDataHandler passiveDataHandler = new PassiveDataHandler(session);
+                new Thread(passiveDataHandler).start();
+                return passiveDataHandler;
 
             case ACTIVE:
                 return null;

@@ -4,8 +4,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.pawkrol.academic.ftp.server.command.CommandDispatcher;
-import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
-import pl.pawkrol.academic.ftp.server.connection.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
@@ -80,7 +78,7 @@ public class CommandHandler implements Runnable{
         Thread.currentThread().interrupt();
     }
 
-    private void sendResponse(Response response) throws IOException {
+    public void sendResponse(Response response) throws IOException {
         clientOutputStream.write(response.toString().getBytes());
         clientOutputStream.flush();
     }
@@ -90,6 +88,7 @@ public class CommandHandler implements Runnable{
                 + socket.getInetAddress().getCanonicalHostName());
         try {
             socket.close();
+            session.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
