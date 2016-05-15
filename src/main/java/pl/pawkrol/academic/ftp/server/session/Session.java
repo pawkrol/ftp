@@ -29,6 +29,7 @@ public class Session {
 
     private int id;
     private User user;
+    private boolean alive;
 
     public Session(SessionManager sessionManager, CommandHandler commandHandler,
                    ConnectionManager connectionManager,
@@ -45,6 +46,7 @@ public class Session {
         this.state = State.NOT_AUTHENTICATED;
         this.mode = Mode.UNKNOWN;
         this.user = new User();
+        this.alive = true;
     }
 
     public boolean authenticate(){
@@ -58,6 +60,11 @@ public class Session {
     }
 
     public void close(){
+        closeAllHandlers();
+        sessionManager.removeSession(this);
+    }
+
+    public void closeAllHandlers(){
         if (commandHandler != null){
             commandHandler.close();
         }
@@ -65,8 +72,6 @@ public class Session {
         if (dataHandler != null){
             dataHandler.close();
         }
-
-        sessionManager.removeSession(this);
     }
 
     public PassiveDataHandler requestPassiveDataHandler(){
@@ -101,5 +106,13 @@ public class Session {
 
     public State getState() {
         return state;
+    }
+
+    public void kill() {
+        alive = false;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 }

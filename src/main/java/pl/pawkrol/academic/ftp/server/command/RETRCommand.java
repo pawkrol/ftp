@@ -1,7 +1,7 @@
 package pl.pawkrol.academic.ftp.server.command;
 
 import pl.pawkrol.academic.ftp.server.connection.DataProcessor;
-import pl.pawkrol.academic.ftp.server.connection.Response;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.filesystem.PermissionDeniedException;
 import pl.pawkrol.academic.ftp.server.session.Session;
 

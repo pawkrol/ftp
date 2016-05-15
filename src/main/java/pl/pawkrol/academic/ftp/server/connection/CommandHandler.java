@@ -3,6 +3,7 @@ package pl.pawkrol.academic.ftp.server.connection;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.command.CommandDispatcher;
 import pl.pawkrol.academic.ftp.server.session.Session;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
@@ -25,13 +26,11 @@ public class CommandHandler implements Runnable{
     private OutputStream clientOutputStream;
 
     private int timeout;
-    private boolean running;
 
     public CommandHandler(ConnectionManager connectionManager, SessionManager sessionManager,
                           Socket socket) {
         this.session = sessionManager.createSession(this);
         this.socket = socket;
-        this.running = true;
         this.timeout = 60; //seconds
         this.commandDispatcher = new CommandDispatcher(session);
         this.connectionManager = connectionManager;
@@ -53,7 +52,7 @@ public class CommandHandler implements Runnable{
             sendResponse(new Response(220, "Server ready."));
 
             String command;
-            while (running && (command = reader.readLine()) != null
+            while (session.isAlive() && (command = reader.readLine()) != null
                     && (!Thread.currentThread().isInterrupted())){
                 sendResponse(commandDispatcher.dispatch(command));
             }
@@ -69,7 +68,11 @@ public class CommandHandler implements Runnable{
     }
 
     public void close(){
-        running = false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void kill() throws IOException { //try it all
@@ -86,9 +89,10 @@ public class CommandHandler implements Runnable{
     private void handleClose() {
         log.log(Level.INFO, "End of connection from: "
                 + socket.getInetAddress().getCanonicalHostName());
+        session.close();
+
         try {
             socket.close();
-            session.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

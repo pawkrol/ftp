@@ -40,4 +40,10 @@ public class SessionManager {
         return sessions.remove(session);
     }
 
+    public void closeAllSessions(){
+        for (Session s: sessions){
+            s.closeAllHandlers();
+        }
+        sessions.clear();
+    }
 }

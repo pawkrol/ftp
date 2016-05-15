@@ -53,6 +53,8 @@ public class ConnectionManager {
     }
 
     public void close() throws IOException {
+        sessionManager.closeAllSessions();
+
         if (serverSocket != null
                 && !serverSocket.isClosed()) {
             serverSocket.close();

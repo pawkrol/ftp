@@ -1,6 +1,6 @@
 package pl.pawkrol.academic.ftp.server.command;
 
-import pl.pawkrol.academic.ftp.server.connection.Response;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
 /**
@@ -20,7 +20,7 @@ public class USERCommand extends Command {
         }
 
         if (session.state == Session.State.AUTHENTICATED){
-            return new Response(501, "Already logged in.");
+            return new Response(666, "Already logged in.");
         }
 
         session.getUser().setUsername(params[0]);

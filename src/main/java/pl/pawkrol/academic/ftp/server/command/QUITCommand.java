@@ -1,6 +1,6 @@
 package pl.pawkrol.academic.ftp.server.command;
 
-import pl.pawkrol.academic.ftp.server.connection.Response;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
 /**
@@ -19,7 +19,7 @@ public class QUITCommand extends Command {
             return response;
         }
 
-        session.close();
+        session.kill();
 
         return new Response(221, "Bye.");
     }

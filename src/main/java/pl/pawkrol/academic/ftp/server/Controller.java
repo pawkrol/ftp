@@ -11,8 +11,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
-import pl.pawkrol.academic.ftp.server.utils.ListViewAppender;
-import pl.pawkrol.academic.ftp.server.utils.LogWrapper;
+import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
+import pl.pawkrol.academic.ftp.common.utils.LogWrapper;
 
 import java.io.IOException;
 import java.net.URL;

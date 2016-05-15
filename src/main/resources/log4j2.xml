@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration packages="pl.pawkrol.academic.ftp.server.utils">
+<Configuration packages="pl.pawkrol.academic.ftp.common.utils">
     <Appenders>
         <ListViewAppender name="logger">
             <PatternLayout pattern="[%d{HH:mm:ss}]    %m"/>
         </ListViewAppender>
+        <ListViewAppender name="rawResponseView">
+            <PatternLayout pattern="%m" />
+        </ListViewAppender>
     </Appenders>
     <Loggers>
-        <Root level="info">
-            <AppenderRef ref="logger"/>
+        <Root level="ERROR">
+
         </Root>
+        <Logger name="logger" level="ALL">
+            <AppenderRef ref="logger"/>
+        </Logger>
+        <Logger name="rawResponseView" level="ALL">
+            <AppenderRef ref="rawResponseView"/>
+        </Logger>
     </Loggers>
 </Configuration>

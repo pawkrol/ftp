@@ -1,4 +1,4 @@
-package pl.pawkrol.academic.ftp.server.utils;
+package pl.pawkrol.academic.ftp.common.utils;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -58,11 +58,11 @@ public final class ListViewAppender extends AbstractAppender{
             Platform.runLater(() -> {
                 if (listView != null){
 
+
+                    logs.add(message);
                     if (logs.size() > 1) {
                         listView.scrollTo(logs.size() - 1);
                     }
-
-                    logs.add(message);
                     listView.setItems(logs);
 
                     listView.setCellFactory(param -> new CellTextColor());

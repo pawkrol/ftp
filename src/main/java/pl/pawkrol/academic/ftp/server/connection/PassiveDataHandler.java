@@ -3,6 +3,7 @@ package pl.pawkrol.academic.ftp.server.connection;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package pl.pawkrol.academic.ftp.server.command;
 
 import org.apache.logging.log4j.Level;
-import pl.pawkrol.academic.ftp.server.connection.Response;
+import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
 /**

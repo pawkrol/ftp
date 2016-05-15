@@ -1,4 +1,4 @@
-package pl.pawkrol.academic.ftp.server.utils;
+package pl.pawkrol.academic.ftp.common.utils;
 
 import org.apache.logging.log4j.Level;
 
