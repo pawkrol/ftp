@@ -5,14 +5,13 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
+<?import javafx.scene.image.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="650.0" prefWidth="800.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.client.Controller">
+<AnchorPane id="AnchorPane" prefHeight="650.0" prefWidth="850.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.client.Controller">
    <children>
       <ListView fx:id="rawResponseView" layoutX="22.0" layoutY="14.0" prefHeight="100.0" prefWidth="760.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="70.0" />
       <ListView fx:id="remoteFilesView" layoutX="20.0" layoutY="272.0" prefHeight="300.0" prefWidth="370.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="220.0" />
-      <ListView fx:id="localFilesView" layoutX="30.0" layoutY="282.0" prefHeight="300.0" prefWidth="370.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="220.0" />
-      <ListView fx:id="transferView" layoutX="32.0" layoutY="24.0" prefHeight="75.0" prefWidth="760.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" />
+      <ListView fx:id="transferView" layoutX="32.0" layoutY="24.0" prefHeight="75.0" prefWidth="760.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
       <FlowPane alignment="CENTER" columnHalignment="CENTER" prefHeight="30.0" prefWidth="760.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
             <Label text="Host:">
@@ -20,7 +19,7 @@
                   <Insets right="10.0" />
                </FlowPane.margin>
             </Label>
-            <TextField fx:id="hostField" prefHeight="25.0" prefWidth="120.0">
+            <TextField fx:id="hostField" onAction="#connectButtonAction" prefHeight="25.0" prefWidth="120.0">
                <FlowPane.margin>
                   <Insets right="10.0" />
                </FlowPane.margin>
@@ -30,7 +29,7 @@
                   <Insets right="10.0" />
                </FlowPane.margin>
             </Label>
-            <TextField fx:id="portField" prefHeight="25.0" prefWidth="60.0">
+            <TextField fx:id="portField" onAction="#connectButtonAction" prefHeight="25.0" prefWidth="60.0">
                <FlowPane.margin>
                   <Insets right="10.0" />
                </FlowPane.margin>
@@ -45,7 +44,7 @@
                   <Insets right="10.0" />
                </padding>
             </Label>
-            <TextField fx:id="loginField" prefHeight="25.0" prefWidth="110.0">
+            <TextField fx:id="loginField" onAction="#connectButtonAction" prefHeight="25.0" prefWidth="110.0">
                <padding>
                   <Insets right="10.0" />
                </padding>
@@ -55,7 +54,7 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Label>
-            <PasswordField fx:id="passwordField" prefWidth="110.0" />
+            <PasswordField fx:id="passwordField" onAction="#connectButtonAction" prefWidth="110.0" />
             <Button fx:id="connectButton" mnemonicParsing="false" onAction="#connectButtonAction" text="Connect">
                <FlowPane.margin>
                   <Insets left="10.0" />
@@ -87,8 +86,11 @@
                   <Insets right="10.0" />
                </padding>
             </Label>
-            <TextField fx:id="localDirField" prefHeight="25.0" prefWidth="290.0" />
+            <TextField fx:id="localDirField" onAction="#onEnterLocalDirField" prefHeight="25.0" prefWidth="290.0" />
          </children>
       </FlowPane>
+      <TreeView fx:id="localFilesView" layoutX="425.0" layoutY="220.0" prefHeight="300.0" prefWidth="370.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="220.0" />
+      <Button layoutX="394.0" layoutY="313.0" mnemonicParsing="false" text="&lt;--" AnchorPane.bottomAnchor="312.0" AnchorPane.leftAnchor="394.0" AnchorPane.rightAnchor="394.0" AnchorPane.topAnchor="313.0" />
+      <Button layoutX="394.0" layoutY="345.0" mnemonicParsing="false" text="--&gt;" AnchorPane.bottomAnchor="280.0" AnchorPane.leftAnchor="394.0" AnchorPane.rightAnchor="394.0" AnchorPane.topAnchor="345.0" />
    </children>
 </AnchorPane>

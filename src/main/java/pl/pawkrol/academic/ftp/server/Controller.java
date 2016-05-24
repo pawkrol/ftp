@@ -14,6 +14,7 @@ import pl.pawkrol.academic.ftp.server.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
 import pl.pawkrol.academic.ftp.common.utils.LogWrapper;
 
+import javax.swing.event.DocumentEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -59,5 +60,6 @@ public class Controller implements Initializable{
             }
         }
     }
+
 
 }

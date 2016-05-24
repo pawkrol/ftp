@@ -49,6 +49,7 @@ public class CommandDispatcher {
         commands.put("PASV", new PASVCommand(session));
         commands.put("RETR", new RETRCommand(session));
         commands.put("PWD", new PWDCommand(session));
+        commands.put("LIST", new LISTCommand(session));
     }
 
 }

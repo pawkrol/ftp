@@ -1,9 +1,13 @@
 package pl.pawkrol.academic.ftp.server.db;
 
+import pl.pawkrol.academic.ftp.server.filesystem.FTPFile;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by pawkrol on 4/23/16.
@@ -24,7 +28,7 @@ public class FileRepository {
         this.dbConnector = dbConnector;
     }
 
-    public DBFile getFileByFilename(String filename) throws SQLException {
+    public synchronized DBFile getFileByFilename(String filename) throws SQLException {
         Connection connection = dbConnector.makeConnection();
         Statement statement = connection.createStatement();
 
@@ -38,9 +42,7 @@ public class FileRepository {
             ResultSet resultSet = statement.executeQuery(query);
 
             if (resultSet.next()){
-                dbFile = new DBFile(resultSet.getInt(FILE_ID), resultSet.getString(FILENAME),
-                                        resultSet.getBoolean(PERM_WRITE), resultSet.getBoolean(PERM_READ),
-                                        resultSet.getInt(OWNER_ID));
+                dbFile = getDBFileFromResultSet(resultSet);
             }
 
         } catch (SQLException e) {
@@ -53,4 +55,37 @@ public class FileRepository {
         return dbFile;
     }
 
+    public synchronized List<DBFile> getFilesFromDirectory(String dir) throws SQLException{
+        Connection connection = dbConnector.makeConnection();
+        Statement statement = connection.createStatement();
+
+        List<DBFile> files = new LinkedList<>();
+
+        try {
+            String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
+                                PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
+                                " FROM " + TABLE_NAME + " WHERE " + FILENAME +
+                                " LIKE \"" + dir + "%\"";
+
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()){
+                files.add(getDBFileFromResultSet(resultSet));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            statement.close();
+            connection.close();
+        }
+
+        return files;
+    }
+
+    private DBFile getDBFileFromResultSet(ResultSet resultSet) throws SQLException{
+        return new DBFile(resultSet.getInt(FILE_ID), resultSet.getString(FILENAME),
+                resultSet.getBoolean(PERM_WRITE), resultSet.getBoolean(PERM_READ),
+                resultSet.getInt(OWNER_ID));
+    }
 }

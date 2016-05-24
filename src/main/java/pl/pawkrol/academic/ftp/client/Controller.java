@@ -4,18 +4,21 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.util.Callback;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
+import pl.pawkrol.academic.ftp.client.filesystem.LocalFilesystem;
 import pl.pawkrol.academic.ftp.client.message.Message;
 import pl.pawkrol.academic.ftp.client.message.MessageResponsePair;
 import pl.pawkrol.academic.ftp.client.message.PWDMessage;
-import pl.pawkrol.academic.ftp.client.message.USERMessage;
 import pl.pawkrol.academic.ftp.client.session.User;
 import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
 import pl.pawkrol.academic.ftp.common.utils.LogWrapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 /**
@@ -23,7 +26,7 @@ import java.util.ResourceBundle;
  */
 public class Controller implements Initializable{
 
-    @FXML private ListView<String> localFilesView;
+    @FXML private TreeView<File> localFilesView;
     @FXML private ListView<String> remoteFilesView;
     @FXML private ListView<LogWrapper> rawResponseView;
     @FXML private ListView<?> transferView;
@@ -40,10 +43,14 @@ public class Controller implements Initializable{
 
     private boolean connected = false;
     private ConnectionManager connectionManager;
+    private LocalFilesystem localFilesystem;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        localFilesystem = new LocalFilesystem(Paths.get("/").toAbsolutePath());
         ListViewAppender.setListView(rawResponseView);
+        setLocalFileListAndPath();
+        localFilesView.setCellFactory(param -> new TreeCellFactory());
     }
 
     @FXML
@@ -62,6 +69,8 @@ public class Controller implements Initializable{
 
             } catch (IOException e) {
                 createWarningDialog("Connection error", "Cannot connect to the remote host");
+            } catch (EmptyFiledException e){
+                //Do nothing
             }
         } else {
             connectionManager.close();
@@ -69,6 +78,12 @@ public class Controller implements Initializable{
             connected = false;
             connectButton.setText("Connect");
         }
+    }
+
+    @FXML
+    public void onEnterLocalDirField(){
+        localFilesystem.setWorkingDirectory(localDirField.getText());
+        setLocalFileListAndPath();
     }
 
     public void onAnyResponse(MessageResponsePair messageResponsePair){
@@ -90,7 +105,7 @@ public class Controller implements Initializable{
         return connectionManager;
     }
 
-    private void connect() throws IOException {
+    private void connect() throws IOException, EmptyFiledException {
         boolean loginFilled = validate(loginField);
         boolean passwordFilled = validate(passwordField);
         boolean hostFilled = validate(hostField);
@@ -104,6 +119,8 @@ public class Controller implements Initializable{
 
             User user = new User(login, password);
             connectionManager = new ConnectionManager(address, port, user);
+        } else {
+            throw new EmptyFiledException("Not all fields are filled");
         }
 
     }
@@ -114,6 +131,13 @@ public class Controller implements Initializable{
                     response.getMessage().replace("\"", "")
             )
         );
+    }
+
+    private void setLocalFileListAndPath(){
+        localDirField.setText(localFilesystem.getWorkingDirectory().toString());
+        TreeItem<File> treeItem = new TreeListItem(new File(localDirField.getText()));
+        treeItem.setExpanded(true);
+        localFilesView.setRoot(treeItem);
     }
 
     private boolean validate(TextField textField){
@@ -135,5 +159,22 @@ public class Controller implements Initializable{
         alert.setContentText(msg);
 
         alert.showAndWait();
+    }
+
+    private final class TreeCellFactory extends TreeCell<File>{
+        @Override
+        protected void updateItem(File item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty) {
+                setText(null);
+            } else {
+                if (getItem().getParentFile() == null){
+                    setText("/");
+                } else {
+                    setText(getItem() == null ? "" : getItem().getName());
+                }
+            }
+        }
     }
 }

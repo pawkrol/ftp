@@ -102,7 +102,7 @@ public final class ListViewAppender extends AbstractAppender{
         protected void updateItem(LogWrapper item, boolean empty) {
             super.updateItem(item, empty);
             if (item != null && !empty) {
-                setText(item.getMessage());
+                setText(getItem().getMessage());
 
                 if (item.getLevel() == Level.WARN){
                     setStyle("-fx-text-fill: orange");

@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 
 public class Main extends Application {
 
@@ -28,7 +29,10 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        controller.getConnectionManager().kill();
+        ConnectionManager connectionManager = controller.getConnectionManager();
+        if (connectionManager != null) {
+            connectionManager.kill();
+        }
     }
 
     public static void main(String[] args) {

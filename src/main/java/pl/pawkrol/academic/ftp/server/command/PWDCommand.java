@@ -1,6 +1,5 @@
 package pl.pawkrol.academic.ftp.server.command;
 
-import pl.pawkrol.academic.ftp.server.Main;
 import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
@@ -21,9 +20,9 @@ public class PWDCommand extends Command{
         }
 
         String workingDir = session.getFileManager().getCurrentDir();
-        if (workingDir.equals(".")){
-            workingDir = Main.rootPath.toString() + "/" + session.getUser().getUsername();
-        }
+//        if (workingDir.equals("~/")){
+//            workingDir = Main.rootPath.toString() + "/" + session.getUser().getUsername() + "/";
+//        }
 
         return new Response(257, "\"" + workingDir + "\"");
     }
