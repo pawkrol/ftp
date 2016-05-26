@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="400.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.server.Controller">
+  <children>
+      <Button fx:id="button" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClickButton" text="Start" />
+      <Label layoutX="290.0" layoutY="12.0" text="Server at port: " />
+      <Label fx:id="portLabel" layoutX="290.0" layoutY="32.0" text="null" />
+      <ListView fx:id="logger" layoutX="10.0" layoutY="50.0" prefHeight="140.0" prefWidth="380.0" />
+  </children>
+</AnchorPane>

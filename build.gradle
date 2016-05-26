@@ -1,0 +1,30 @@
+group 'ftp'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+idea{
+    module{
+        sourceDirs += file('src/main/java')
+        testSourceDirs += file('src/test/java')
+
+        inheritOutputDirs = false
+        outputDir = file('bin')
+        testOutputDir = file('bin/test')
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile ('org.apache.logging.log4j:log4j-api:2.5')
+    compile ('org.apache.logging.log4j:log4j-core:2.5')
+    compile ('mysql:mysql-connector-java:5.1.38')
+    testCompile('junit:junit:4.12')
+}
