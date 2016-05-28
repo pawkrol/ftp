@@ -6,12 +6,9 @@ import pl.pawkrol.academic.ftp.client.TransferWatcher;
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.client.connection.DataConnector;
-import pl.pawkrol.academic.ftp.client.message.plain.CWDMessage;
-import pl.pawkrol.academic.ftp.client.message.plain.DELEMessage;
-import pl.pawkrol.academic.ftp.client.message.plain.MKDMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.*;
 import pl.pawkrol.academic.ftp.client.message.transfer.RETRMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.LISTMessage;
-import pl.pawkrol.academic.ftp.client.message.plain.PWDMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.STORMessage;
 import pl.pawkrol.academic.ftp.client.session.User;
 import pl.pawkrol.academic.ftp.server.Main;
@@ -53,7 +50,11 @@ public class RemoteFilesystem {
     }
 
     public void removeDirectory(String name){
-        commandHandler.sendMessage(new DELEMessage(name), null);
+        if (name.endsWith("/")){
+            commandHandler.sendMessage(new RMDMessage(name), null);
+        } else {
+            commandHandler.sendMessage(new DELEMessage(name), null);
+        }
     }
 
     public void updateRemoteDirList(){

@@ -54,6 +54,7 @@ public class CommandDispatcher {
         commands.put("STOR", new STORCommand(session));
         commands.put("MKD", new MKDCommand(session));
         commands.put("DELE", new DELECommand(session));
+        commands.put("RMD", new RMDCommand(session));
     }
 
 }

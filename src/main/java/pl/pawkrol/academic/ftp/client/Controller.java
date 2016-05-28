@@ -159,6 +159,12 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
     @FXML
     public void onRemoteRemove(){
         String name = remoteFilesView.getSelectionModel().getSelectedItem();
+        if (name == null) {
+            createWarningDialog(Alert.AlertType.ERROR, "File not selected",
+                    "Please select file to delete");
+            return;
+        }
+
         createWarningDialog(Alert.AlertType.CONFIRMATION, "File delete",
                             "Do you want to delete \"" + name + "\"?")
             .ifPresent(buttonType -> {
@@ -175,6 +181,29 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
                     localFilesystem.createDirectory(filename);
                     Platform.runLater(this::setLocalFileListAndPath);
                 });
+    }
+
+    @FXML
+    public void onLocalRemove(){
+        String filename = localFilesystem.getSelectedFile();
+        if (filename.isEmpty()) {
+            createWarningDialog(Alert.AlertType.ERROR, "File not selected",
+                    "Please select file to delete");
+            return;
+        }
+
+        createWarningDialog(Alert.AlertType.CONFIRMATION, "File delete",
+                "Do you want to delete \"" + filename + "\"?")
+                .ifPresent(buttonType -> {
+                    if (buttonType == ButtonType.OK) {
+                        localFilesystem.remove(filename);
+                        localFilesystem.setWorkingDirectory(
+                                localFilesystem.getWorkingDirectory().getParent()
+                        );
+                        Platform.runLater(this::setLocalFileListAndPath);
+                    }
+                });
+
     }
 
     public ConnectionManager getConnectionManager() {
@@ -228,6 +257,7 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
                 break;
             case "MKD":
             case "DELE":
+            case "RMD":
                 if (response.getCode() == 250){
                     remoteFilesystem.updateRemoteDirList();
                 }
@@ -244,9 +274,9 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
         if (file.isDirectory()) {
             localFilesystem.setWorkingDirectory(file.getPath());
             localDirField.setText(localFilesystem.getWorkingDirectory().toString());
-        } else {
-            localFilesystem.setSelectedFile(file.getPath());
         }
+
+        localFilesystem.setSelectedFile(file.getPath());
     }
 
     private void connect() throws IOException, EmptyFiledException {

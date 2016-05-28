@@ -119,5 +119,14 @@
             </ImageView>
          </graphic>
       </Button>
+      <Button layoutX="494.0" layoutY="520.0" mnemonicParsing="false" onAction="#onLocalRemove">
+         <graphic>
+            <ImageView fitHeight="16.0" fitWidth="16.0">
+               <image>
+                  <Image url="removeIco.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

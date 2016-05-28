@@ -1,9 +1,11 @@
 package pl.pawkrol.academic.ftp.client.filesystem;
 
 import javafx.scene.control.TreeItem;
+import org.apache.commons.io.FileUtils;
 import pl.pawkrol.academic.ftp.client.TreeListItem;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -46,5 +48,19 @@ public class LocalFilesystem {
                 + (workingDirectory.endsWith("/") ? "" : "/") + filename;
         File file = new File(path);
         return file.mkdir();
+    }
+
+    public boolean remove(String filename){
+        File file = new File(filename);
+        if (file.isDirectory()) {
+            try {
+                FileUtils.deleteDirectory(file);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return file.delete();
     }
 }
