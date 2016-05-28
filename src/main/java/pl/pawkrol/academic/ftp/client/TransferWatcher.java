@@ -49,10 +49,10 @@ public class TransferWatcher {
     private String formatMessage(Type type, String filename, long time, int bytes){
         if (time != 0) {
             float speed = bytes / time;
-            return String.format("%s\t%s\t%d bytes in %d ms <%.2f>bytes/ms",
+            return String.format("%s\t\"%s\"\t%d bytes in %d ms <%.2f>bytes/ms",
                     type, filename, bytes, time, speed);
         } else {
-            return String.format("%s\t%s\t%d bytes in %d ms",
+            return String.format("%s\t\"%s\"\t%d bytes in %d ms",
                     type, filename, bytes, time);
         }
     }

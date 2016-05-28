@@ -6,12 +6,20 @@ import pl.pawkrol.academic.ftp.client.TransferWatcher;
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.client.connection.DataConnector;
-import pl.pawkrol.academic.ftp.client.message.plain.RETRMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.CWDMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.DELEMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.MKDMessage;
+import pl.pawkrol.academic.ftp.client.message.transfer.RETRMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.LISTMessage;
 import pl.pawkrol.academic.ftp.client.message.plain.PWDMessage;
+import pl.pawkrol.academic.ftp.client.message.transfer.STORMessage;
+import pl.pawkrol.academic.ftp.client.session.User;
+import pl.pawkrol.academic.ftp.server.Main;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by pawkrol on 5/26/16.
@@ -36,6 +44,18 @@ public class RemoteFilesystem {
         );
     }
 
+    public void changeWorkingDirecory(String path){
+        commandHandler.sendMessage(new CWDMessage(path), null);
+    }
+
+    public void addDirectory(String name){
+        commandHandler.sendMessage(new MKDMessage(name), null);
+    }
+
+    public void removeDirectory(String name){
+        commandHandler.sendMessage(new DELEMessage(name), null);
+    }
+
     public void updateRemoteDirList(){
         connectionManager.getDataHandler().setConnector(new DataConnector() {
             Socket socket;
@@ -54,6 +74,9 @@ public class RemoteFilesystem {
                     );
 
                     files = FXCollections.observableArrayList();
+                    if (!workingDirectory.equals("/")){
+                        files.add("..");
+                    }
                     String line;
                     while ((line = reader.readLine()) != null){
                         files.add(line);
@@ -64,7 +87,8 @@ public class RemoteFilesystem {
                     //e.printStackTrace();
                 } finally {
                     try {
-                        reader.close();
+                        if (reader != null)
+                            reader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -83,6 +107,60 @@ public class RemoteFilesystem {
             }
         });
         commandHandler.sendMessage(new LISTMessage(workingDirectory), null);
+    }
+
+    public void uploadFile(String filepath){
+        String filename = Paths.get(filepath).getFileName().toString();
+        connectionManager.getDataHandler().setConnector(new DataConnector() {
+            Socket socket;
+
+            long time;
+            int bytes = 0;
+
+            @Override
+            public void init(Socket socket) {
+                this.socket = socket;
+            }
+
+            @Override
+            public void connect() {
+                try {
+                    FileInputStream fis = new FileInputStream(new File(filepath));
+
+                    int c;
+                    byte[] buff = new byte[1024];
+                    final long stime = System.nanoTime();
+                    while ((c = fis.read(buff)) > 0){
+                        socket.getOutputStream().write(buff, 0, c);
+                        bytes += c;
+                    }
+                    final long etime = System.nanoTime();
+
+                    time = (etime - stime) / 1000000;
+
+                } catch (IOException e) {
+                   // e.printStackTrace();
+                } finally {
+                    close();
+                    if (bytes != 0){
+                        transferWatcher.addEntry(TransferWatcher.Type.UPLOAD, filename,
+                                time, bytes);
+                    }
+                }
+            }
+
+            @Override
+            public void close() {
+                try {
+                    if (socket != null) {
+                        socket.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        commandHandler.sendMessage(new STORMessage(filename), null);
     }
 
     public void downloadFile(String remotePath, String localPath){
@@ -117,6 +195,7 @@ public class RemoteFilesystem {
                 } catch (IOException e) {
                    // e.printStackTrace();
                 } finally {
+                    close();
                     if (bytes != 0){
                         transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
                                 time, bytes);

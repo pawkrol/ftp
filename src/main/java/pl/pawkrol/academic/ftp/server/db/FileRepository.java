@@ -1,7 +1,5 @@
 package pl.pawkrol.academic.ftp.server.db;
 
-import pl.pawkrol.academic.ftp.server.filesystem.FTPFile;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,29 +26,52 @@ public class FileRepository {
         this.dbConnector = dbConnector;
     }
 
+    public synchronized void removeFileRecord(String filename) throws SQLException{
+        Connection connection = dbConnector.makeConnection();
+        Statement statement = connection.createStatement();
+
+        String query = "DELETE FROM " + TABLE_NAME + " WHERE "
+                            + FILENAME + "=\"" + filename + "\"";
+        statement.executeUpdate(query);
+
+        connection.close();
+        statement.close();
+    }
+
+    public synchronized void putFileRecord(String filename, boolean writable,
+                                           boolean readable, User user) throws SQLException {
+        Connection connection = dbConnector.makeConnection();
+        Statement statement = connection.createStatement();
+
+        String query = "INSERT INTO " + TABLE_NAME + " (" + FILENAME + ", " + PERM_WRITE + ", "
+                                + PERM_READ + ", " + OWNER_ID + ") VALUES(\"" + filename + "\", "
+                                + (writable ? "1" : "0") + ", " + (readable ? "1" : "0") + ", "
+                                + user.getUserId() + ")";
+
+        statement.executeUpdate(query);
+
+        connection.close();
+        statement.close();
+    }
+
     public synchronized DBFile getFileByFilename(String filename) throws SQLException {
         Connection connection = dbConnector.makeConnection();
         Statement statement = connection.createStatement();
 
         DBFile dbFile = null;
 
-        try {
-            String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
-                             PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
-                                " FROM " + TABLE_NAME + " WHERE " + FILENAME + " = \"" + filename + "\"";
+        String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
+                         PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
+                            " FROM " + TABLE_NAME + " WHERE " + FILENAME + " = \"" + filename + "\"";
 
-            ResultSet resultSet = statement.executeQuery(query);
+        ResultSet resultSet = statement.executeQuery(query);
 
-            if (resultSet.next()){
-                dbFile = getDBFileFromResultSet(resultSet);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            statement.close();
-            connection.close();
+        if (resultSet.next()){
+            dbFile = getDBFileFromResultSet(resultSet);
         }
+
+        statement.close();
+        connection.close();
 
         return dbFile;
     }
@@ -61,24 +82,19 @@ public class FileRepository {
 
         List<DBFile> files = new LinkedList<>();
 
-        try {
-            String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
-                                PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
-                                " FROM " + TABLE_NAME + " WHERE " + FILENAME +
-                                " LIKE \"" + dir + "%\"";
+        String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
+                            PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
+                            " FROM " + TABLE_NAME + " WHERE " + FILENAME +
+                            " LIKE \"" + dir + "%\"";
 
-            ResultSet resultSet = statement.executeQuery(query);
+        ResultSet resultSet = statement.executeQuery(query);
 
-            while (resultSet.next()){
-                files.add(getDBFileFromResultSet(resultSet));
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            statement.close();
-            connection.close();
+        while (resultSet.next()){
+            files.add(getDBFileFromResultSet(resultSet));
         }
+
+        statement.close();
+        connection.close();
 
         return files;
     }

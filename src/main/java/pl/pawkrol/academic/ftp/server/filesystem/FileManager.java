@@ -1,12 +1,12 @@
 package pl.pawkrol.academic.ftp.server.filesystem;
 
+import org.apache.commons.io.FileUtils;
+import pl.pawkrol.academic.ftp.client.session.*;
 import pl.pawkrol.academic.ftp.server.Main;
 import pl.pawkrol.academic.ftp.server.db.*;
+import pl.pawkrol.academic.ftp.server.db.User;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -26,6 +26,28 @@ public class FileManager {
     public FileManager(DBConnector dbConnector){
         this.userRepository = dbConnector.requestUserRepository();
         this.fileRepository = dbConnector.requestFileRepository();
+    }
+
+    public synchronized boolean removeFile(String filename, User user) throws SQLException{
+        File file = new File(constructFilePath(filename, user));
+        if (!file.isDirectory()) {
+            fileRepository.removeFileRecord(filename);
+            return file.delete();
+        } else {
+            return false;
+        }
+    }
+
+    public synchronized void removeDirectory(String filename, User user) throws SQLException, IOException {
+        fileRepository.removeFileRecord(filename);
+        File file = new File(constructFilePath(filename, user));
+        FileUtils.deleteDirectory(file);
+    }
+
+
+    public synchronized void putFileRecord(String name, boolean writable, boolean readable, User user)
+            throws SQLException{
+        fileRepository.putFileRecord(name, writable, readable, user);
     }
 
     public synchronized FTPFile getFTPFile(String filename, User user){
@@ -80,7 +102,7 @@ public class FileManager {
         return ftpFiles;
     }
 
-    public FileInputStream getFileInputStream(String filename, User user) throws FileNotFoundException,
+    public synchronized FileInputStream getFileInputStream(String filename, User user) throws FileNotFoundException,
                                                         PermissionDeniedException, IsDirectoryException{
         FTPFile ftpFile = getFTPFile(filename, user);
         if (ftpFile == null){
@@ -119,5 +141,15 @@ public class FileManager {
     private boolean canUserAccessFile(User user, FTPFile ftpFile){
         return ftpFile.getUser() == null || (ftpFile.getUser().equals(user)
                 && ftpFile.isPermRead());
+    }
+
+    public String constructFilePath(String filename, User user){
+        String fileDir = Main.rootPath.toString() + "/"
+                + user.getUsername() + "/" + currentDir;
+        if (currentDir.endsWith("/")){
+            return fileDir + filename;
+        } else {
+            return fileDir + "/" + filename;
+        }
     }
 }

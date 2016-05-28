@@ -8,6 +8,8 @@ import pl.pawkrol.academic.ftp.server.session.Session;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -43,15 +45,15 @@ public class LISTCommand extends Command{
                     this.socket = socket;
 
                     try {
+                        Path currentDir = Paths.get(session.getFileManager().getCurrentDir());
                         writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                         for (FTPFile file : FTPfiles) {
-//                            socket.getOutputStream().write(
-//                                    (formatFileEntry(file) + "\n").getBytes()
-//                            );
+                            if (!Paths.get(file.getPath()).getParent().equals(currentDir)){
+                                continue;
+                            }
                             writer.write(formatFileEntry(file) + "\n");
                             writer.flush();
                         }
-//                        socket.getOutputStream().flush();
 
                         session.getCommandHandler().sendResponse(new Response(226, "Transfer complete"));
                         session.getDataHandler().close();

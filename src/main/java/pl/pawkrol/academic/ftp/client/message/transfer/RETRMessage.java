@@ -1,4 +1,4 @@
-package pl.pawkrol.academic.ftp.client.message.plain;
+package pl.pawkrol.academic.ftp.client.message.transfer;
 
 import pl.pawkrol.academic.ftp.client.message.transfer.TransferMessage;
 

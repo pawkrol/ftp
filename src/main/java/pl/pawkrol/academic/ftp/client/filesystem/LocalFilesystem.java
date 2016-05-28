@@ -15,7 +15,7 @@ import java.util.List;
 public class LocalFilesystem {
 
     private Path workingDirectory;
-    private String selectedFile;
+    private String selectedFile = "";
 
     public LocalFilesystem(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
@@ -39,5 +39,12 @@ public class LocalFilesystem {
 
     public void setSelectedFile(String selectedFile) {
         this.selectedFile = selectedFile;
+    }
+
+    public boolean createDirectory(String filename){
+        String path = workingDirectory
+                + (workingDirectory.endsWith("/") ? "" : "/") + filename;
+        File file = new File(path);
+        return file.mkdir();
     }
 }
