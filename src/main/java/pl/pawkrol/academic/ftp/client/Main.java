@@ -21,7 +21,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load(getClass().getResource("/client_layout.fxml").openStream());
         controller = fxmlLoader.getController();
 
-        primaryStage.setTitle("FTPer Client");
+        primaryStage.setTitle("Paweł Król - FTP Client");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.show();

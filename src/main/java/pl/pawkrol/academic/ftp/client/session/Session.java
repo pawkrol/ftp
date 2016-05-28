@@ -2,6 +2,7 @@ package pl.pawkrol.academic.ftp.client.session;
 
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
+import pl.pawkrol.academic.ftp.client.connection.DataHandler;
 
 /**
  * Created by pawkrol on 4/25/16.
@@ -22,13 +23,28 @@ public class Session {
     private final User user;
 
     private CommandHandler commandHandler;
+    private DataHandler dataHandler;
 
     public Session(ConnectionManager connectionManager, User user) {
         this.connectionManager = connectionManager;
         this.user = user;
 
         this.state = State.NOT_AUTHENTICATED;
-        this.mode = Mode.UNKNOWN;
+        this.mode = Mode.PASSIVE;
+    }
+
+    public void close(){
+        if (commandHandler != null){
+            commandHandler.close();
+        }
+        if (dataHandler != null){
+            dataHandler.close();
+        }
+    }
+
+    public void authenticate(){
+        Authenticator authenticator = new Authenticator(connectionManager.getCommandHandler());
+        authenticator.authenticate(this);
     }
 
     public CommandHandler getCommandHandler() {
@@ -39,20 +55,18 @@ public class Session {
         this.commandHandler = commandHandler;
     }
 
-    public void close(){
-        if (commandHandler != null){
-            commandHandler.close();
+    public DataHandler getDataHandler() {
+        return dataHandler;
+    }
+
+    public void setDataHandler(DataHandler dataHandler) {
+        if (dataHandler != null){
+            dataHandler.close();
         }
+        this.dataHandler = dataHandler;
     }
 
-    public boolean authenticate(){
-       if (new Authenticator(connectionManager.getMessageProcessor()).authenticate(user)){
-           state = State.AUTHENTICATED;
-           return true;
-       } else {
-           return false;
-       }
+    public User getUser() {
+        return user;
     }
-
-
 }

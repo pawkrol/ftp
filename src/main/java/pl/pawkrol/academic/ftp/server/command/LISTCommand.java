@@ -2,12 +2,11 @@ package pl.pawkrol.academic.ftp.server.command;
 
 import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.server.connection.DataProcessor;
-import pl.pawkrol.academic.ftp.server.db.NotDirectoryException;
+import pl.pawkrol.academic.ftp.server.filesystem.NotDirectoryException;
 import pl.pawkrol.academic.ftp.server.filesystem.FTPFile;
 import pl.pawkrol.academic.ftp.server.session.Session;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
@@ -32,23 +31,27 @@ public class LISTCommand extends Command{
         }
 
         try {
-            List<FTPFile> files =
+            List<FTPFile> FTPfiles =
                     session.getFileManager().getFilesFromDirectory(params[0], session.getUser());
 
             session.getDataHandler().setDataProcessor(new DataProcessor() {
                 Socket socket;
+                BufferedWriter writer;
 
                 @Override
                 public void execute(Socket socket) {
                     this.socket = socket;
 
                     try {
-                        for (FTPFile file : files) {
-                            socket.getOutputStream().write(
-                                    (formatFileEntry(file) + "\n").getBytes()
-                            );
+                        writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                        for (FTPFile file : FTPfiles) {
+//                            socket.getOutputStream().write(
+//                                    (formatFileEntry(file) + "\n").getBytes()
+//                            );
+                            writer.write(formatFileEntry(file) + "\n");
+                            writer.flush();
                         }
-                        socket.getOutputStream().flush();
+//                        socket.getOutputStream().flush();
 
                         session.getCommandHandler().sendResponse(new Response(226, "Transfer complete"));
                         session.getDataHandler().close();
@@ -60,6 +63,7 @@ public class LISTCommand extends Command{
                 @Override
                 public void disconnect() {
                     try {
+                        writer.close();
                         socket.close();
                     } catch (IOException e){
                         e.printStackTrace();
@@ -79,6 +83,8 @@ public class LISTCommand extends Command{
     }
 
     private String formatFileEntry(FTPFile file){
-        return String.format("%s", file.getPath() + (file.isDirectory() ? "/" : ""));
+        return String.format("%s\t\t\t%s%s", file.getPath(),
+                file.isPermRead() ? "r" : "-",
+                file.isPermWrite() ? "w" : "-"); //TODO: add fancy stuff
     }
 }

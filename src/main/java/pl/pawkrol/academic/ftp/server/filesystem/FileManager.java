@@ -20,7 +20,7 @@ public class FileManager {
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
 
-    private String currentDir = "~/";
+    private String currentDir = "/";
 
     public FileManager(DBConnector dbConnector){
         this.userRepository = dbConnector.requestUserRepository();
@@ -43,7 +43,7 @@ public class FileManager {
                 return null;
             }
 
-            ftpFile = new FTPFile(file, fileUser, path, dbFile.isPermRead(),
+            ftpFile = new FTPFile(file, fileUser, dbFile.getPath(), dbFile.isPermRead(),
                                     dbFile.isPermWrite(), file.isDirectory());
 
         } catch (SQLException e) {
@@ -93,8 +93,18 @@ public class FileManager {
         return new FileReader(ftpFile.getFile());
     }
 
-    public void setCurrentDir(String currentDir) {
-        this.currentDir = currentDir;
+    public void changeDir(String dir, User user) throws NotDirectoryException,
+                                                    FileDoesNotExistsException{
+        if (!dir.equals("/")) {
+            FTPFile file = getFTPFile(dir, user);
+            if (file == null) {
+                throw new FileDoesNotExistsException();
+            } else if (!file.isDirectory()) {
+                throw new NotDirectoryException();
+            }
+        }
+
+        this.currentDir = dir;
     }
 
     public String getCurrentDir(){

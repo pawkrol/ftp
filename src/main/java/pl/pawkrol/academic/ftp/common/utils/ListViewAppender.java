@@ -58,7 +58,6 @@ public final class ListViewAppender extends AbstractAppender{
             Platform.runLater(() -> {
                 if (listView != null){
 
-
                     logs.add(message);
                     if (logs.size() > 1) {
                         listView.scrollTo(logs.size() - 1);
@@ -101,7 +100,7 @@ public final class ListViewAppender extends AbstractAppender{
         @Override
         protected void updateItem(LogWrapper item, boolean empty) {
             super.updateItem(item, empty);
-            if (item != null && !empty) {
+            if (getItem() != null && !empty) {
                 setText(getItem().getMessage());
 
                 if (item.getLevel() == Level.WARN){

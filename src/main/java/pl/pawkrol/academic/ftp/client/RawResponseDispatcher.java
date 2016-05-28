@@ -35,7 +35,7 @@ public class RawResponseDispatcher {
         return false;
     }
 
-    private String formatLog(String command, String response){
+    private synchronized String formatLog(String command, String response){
         return command + ": " + response;
     }
 }

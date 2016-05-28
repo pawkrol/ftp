@@ -28,7 +28,7 @@ public class Main extends Application {
         connectionManager = new ConnectionManager(2121, 4, dbConnector);
         controller.setConnectionManager(connectionManager);
 
-        primaryStage.setTitle("FTPer Server");
+        primaryStage.setTitle("Paweł Król - FTP Server");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -36,7 +36,8 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        connectionManager.close();
+        if (connectionManager != null)
+            connectionManager.close();
     }
 
     public static void main(String[] args) {

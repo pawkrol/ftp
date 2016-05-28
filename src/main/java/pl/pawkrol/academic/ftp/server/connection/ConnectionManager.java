@@ -60,8 +60,10 @@ public class ConnectionManager {
             serverSocket.close();
         }
 
-        executorService.shutdown();
-        executorService.shutdownNow();
+        if (executorService != null) {
+            executorService.shutdown();
+            executorService.shutdownNow();
+        }
     }
 
     public DataHandler obtainDataHandler(Session session){

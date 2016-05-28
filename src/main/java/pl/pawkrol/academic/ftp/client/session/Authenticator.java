@@ -1,46 +1,42 @@
 package pl.pawkrol.academic.ftp.client.session;
 
-import pl.pawkrol.academic.ftp.client.message.MessageProcessor;
-import pl.pawkrol.academic.ftp.client.message.PASSMessage;
-import pl.pawkrol.academic.ftp.client.message.USERMessage;
-import pl.pawkrol.academic.ftp.common.Response;
+import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
+import pl.pawkrol.academic.ftp.client.message.AUTHMessage;
 
 /**
  * Created by pawkrol on 5/15/16.
  */
 public class Authenticator {
 
-    private final MessageProcessor messageProcessor;
+    enum Status{
+        NOT_AUTHENTICATED,
+        AUTHENTICATED
+    }
+    public Status status;
 
-    private boolean authenticated;
+    private final CommandHandler commandHandler;
+
     private User user;
+    private Session session;
 
-    public Authenticator(MessageProcessor messageProcessor) {
-        this.messageProcessor = messageProcessor;
+    public Authenticator(CommandHandler commandHandler) {
+        this.commandHandler = commandHandler;
+        this.status = Status.NOT_AUTHENTICATED;
     }
 
-    public boolean authenticate(User user){
-        authenticated = false;
-        this.user = user;
+    public void authenticate(Session session){
+        this.user = session.getUser();
+        this.session = session;
 
-        messageProcessor.sendMessage(new USERMessage(user.getUsername()), this::onUsername);
-
-        return authenticated;
-    }
-
-    private void onUsername(Response response){
-        int code = response.getCode();
-
-        if (code == 331){
-            messageProcessor.sendMessage(
-
-                    new PASSMessage(user.getPassword()), passResponse -> {
-                         if (passResponse.getCode() == 230){
-                             authenticated = true;
-                         }
-                    }
-
-            );
+        if (status.equals(Status.NOT_AUTHENTICATED)) {
+            commandHandler.sendMessage(new AUTHMessage(user.getUsername(), user.getPassword()), response -> {
+                if (response.getCode() == 230){
+                    status = Status.AUTHENTICATED;
+                    session.state = Session.State.AUTHENTICATED;
+                }
+            });
         }
+
     }
+
 }

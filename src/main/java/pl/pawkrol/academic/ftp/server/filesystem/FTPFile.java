@@ -12,13 +12,13 @@ public class FTPFile {
 
     private File file;
     private User user;
-    private Path path;
+    private String path;
 
     private boolean permRead;
     private boolean permWrite;
     private boolean directory;
 
-    public FTPFile(File file, User user, Path path, boolean permRead, boolean permWrite, boolean directory) {
+    public FTPFile(File file, User user, String path, boolean permRead, boolean permWrite, boolean directory) {
         this.file = file;
         this.user = user;
         this.path = path;
@@ -43,11 +43,11 @@ public class FTPFile {
         this.user = user;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
 

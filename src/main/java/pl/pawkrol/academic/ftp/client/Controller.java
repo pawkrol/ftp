@@ -4,12 +4,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.util.Callback;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.client.filesystem.LocalFilesystem;
+import pl.pawkrol.academic.ftp.client.filesystem.RemoteFilesystem;
 import pl.pawkrol.academic.ftp.client.message.Message;
 import pl.pawkrol.academic.ftp.client.message.MessageResponsePair;
-import pl.pawkrol.academic.ftp.client.message.PWDMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.CWDMessage;
 import pl.pawkrol.academic.ftp.client.session.User;
 import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
@@ -29,7 +29,7 @@ public class Controller implements Initializable{
     @FXML private TreeView<File> localFilesView;
     @FXML private ListView<String> remoteFilesView;
     @FXML private ListView<LogWrapper> rawResponseView;
-    @FXML private ListView<?> transferView;
+    @FXML private ListView<String> transferView;
 
     @FXML private TextField remoteDirField;
     @FXML private TextField localDirField;
@@ -44,6 +44,7 @@ public class Controller implements Initializable{
     private boolean connected = false;
     private ConnectionManager connectionManager;
     private LocalFilesystem localFilesystem;
+    private RemoteFilesystem remoteFilesystem;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -60,23 +61,28 @@ public class Controller implements Initializable{
                 connect();
 
                 if (connectionManager != null){
-                    connectionManager.getMessageProcessor()
+                    connectionManager.getCommandHandler()
                                         .registerMessageResponseListener(this::onAnyResponse);
+                    connectionManager.getCommandHandler()
+                                        .registerMessageResponseListener(
+                                                new TransferWatcher(transferView)::watch
+                                        );
+                    remoteFilesystem = new RemoteFilesystem(connectionManager);
+                    connectionManager.open();
                 }
 
                 connected = true;
                 connectButton.setText("Disconnect");
+                remoteDirField.setDisable(false);
+                remoteFilesView.setDisable(false);
 
             } catch (IOException e) {
-                createWarningDialog("Connection error", "Cannot connect to the remote host");
+                createWarningDialog("Connection error", "Cannot setConnector to the remote host");
             } catch (EmptyFiledException e){
                 //Do nothing
             }
         } else {
-            connectionManager.close();
-
-            connected = false;
-            connectButton.setText("Connect");
+            disconnect();
         }
     }
 
@@ -86,23 +92,52 @@ public class Controller implements Initializable{
         setLocalFileListAndPath();
     }
 
-    public void onAnyResponse(MessageResponsePair messageResponsePair){
-        Response response = messageResponsePair.getResponse();
-        Message message = messageResponsePair.getMessage();
-
-        switch (message.getCommand()){
-            case "PASS":
-                if (response.getCode() == 230){
-                    connectionManager.getMessageProcessor().sendMessage(
-                            new PWDMessage(), this::onInitRemoteDir
-                    );
-                }
-                break;
-        }
+    @FXML
+    public void onEnterRemoteDirField(){
+        connectionManager.getCommandHandler()
+                .sendMessage(new CWDMessage(remoteDirField.getText()), null);
     }
 
     public ConnectionManager getConnectionManager() {
         return connectionManager;
+    }
+
+    public synchronized void onAnyResponse(MessageResponsePair messageResponsePair){
+        Response response = messageResponsePair.getResponse();
+        Message message = messageResponsePair.getMessage();
+
+        if (response.getCode() == 426){
+            disconnect();
+            return;
+        }
+
+        switch (message.getCommand()){
+            case "PASS":
+                if (response.getCode() == 230){
+                    remoteFilesystem.updateWorkingDirectory();
+                } else if (response.getCode() != 501) {
+                    disconnect();
+                }
+                break;
+            case "PWD":
+                onInitRemoteDir();
+                remoteFilesystem.updateRemoteDirList();
+                break;
+            case "LIST":
+                if (response.getCode() == 226) {
+                    setRemoteFileList();
+                }
+                break;
+            case "CWD":
+                if (response.getCode() == 250){
+                    remoteFilesystem.updateWorkingDirectory();
+                } else if (response.getCode() == 550){
+                    Platform.runLater(() ->
+                            remoteDirField.setText(remoteFilesystem.getWorkingDirectory())
+                    );
+                }
+                break;
+        }
     }
 
     private void connect() throws IOException, EmptyFiledException {
@@ -125,10 +160,10 @@ public class Controller implements Initializable{
 
     }
 
-    private void onInitRemoteDir(Response response){
+    private void onInitRemoteDir(){
         Platform.runLater(() ->
             remoteDirField.setText(
-                    response.getMessage().replace("\"", "")
+                    remoteFilesystem.getWorkingDirectory()
             )
         );
     }
@@ -138,6 +173,23 @@ public class Controller implements Initializable{
         TreeItem<File> treeItem = new TreeListItem(new File(localDirField.getText()));
         treeItem.setExpanded(true);
         localFilesView.setRoot(treeItem);
+    }
+
+    private void setRemoteFileList(){
+        Platform.runLater(() ->
+                remoteFilesView.setItems(remoteFilesystem.getFiles())
+        );
+    }
+
+    private void disconnect(){
+        Platform.runLater(() -> {
+            connectionManager.close();
+
+            connected = false;
+            connectButton.setText("Connect");
+            remoteDirField.setDisable(true);
+            remoteFilesView.setDisable(true);
+        });
     }
 
     private boolean validate(TextField textField){

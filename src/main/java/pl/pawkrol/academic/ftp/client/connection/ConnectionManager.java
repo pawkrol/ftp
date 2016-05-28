@@ -1,8 +1,7 @@
 package pl.pawkrol.academic.ftp.client.connection;
 
 import pl.pawkrol.academic.ftp.client.RawResponseDispatcher;
-import pl.pawkrol.academic.ftp.client.message.MessageProcessor;
-import pl.pawkrol.academic.ftp.client.message.QUITMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.QUITMessage;
 import pl.pawkrol.academic.ftp.client.session.Session;
 import pl.pawkrol.academic.ftp.client.session.User;
 
@@ -21,7 +20,6 @@ public class ConnectionManager {
     private final Socket socket;
     private final Session session;
     private final CommandHandler commandHandler;
-    private final MessageProcessor messageProcessor;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public ConnectionManager(String address, int port, User user) throws IOException {
@@ -29,16 +27,22 @@ public class ConnectionManager {
         this.address = address;
         this.socket = new Socket(address, port);
         this.session = new Session(this, user);
-        this.commandHandler = new CommandHandler(socket, session);
-        this.messageProcessor = new MessageProcessor(commandHandler, executorService);
-        messageProcessor.registerMessageResponseListener(new RawResponseDispatcher()::dispatch);
+        this.commandHandler = new CommandHandler(socket, session, executorService, this);
 
+        commandHandler.registerMessageResponseListener(new RawResponseDispatcher()::dispatch);
+    }
+
+    public void open(){
         commandHandler.init();
     }
 
     //Graceful close
     public void close(){
-        messageProcessor.sendMessage(new QUITMessage(), response -> kill());
+        if (!socket.isClosed() && commandHandler != null) {
+            commandHandler.sendMessage(new QUITMessage(), response -> kill());
+        } else {
+            kill();
+        }
     }
 
     public void kill(){
@@ -53,15 +57,31 @@ public class ConnectionManager {
         }
     }
 
+    public DataHandler getDataHandler(){
+        Session.Mode mode = session.mode;
+        if (session.getDataHandler() != null){
+            return session.getDataHandler();
+        }
+
+        if (mode.equals(Session.Mode.PASSIVE)){
+            session.setDataHandler(new PassiveDataHandler(commandHandler));
+            return session.getDataHandler();
+        } else if (mode.equals(Session.Mode.ACTIVE)) {
+            return null; //no active yet
+        }
+
+        return null;
+    }
+
+    public CommandHandler getCommandHandler() {
+        return commandHandler;
+    }
+
     public int getPort() {
         return port;
     }
 
     public String getAddress() {
         return address;
-    }
-
-    public MessageProcessor getMessageProcessor() {
-        return messageProcessor;
     }
 }
