@@ -14,6 +14,22 @@ import pl.pawkrol.academic.ftp.common.Response;
  */
 public class TransferWatcher {
 
+    public enum Type{
+        DOWNLOAD("[DOWNLOAD]"),
+        UPLOAD("[UPLOAD]");
+
+        private String name;
+
+        Type(String name){
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     private ListView<String> view;
     private ObservableList<String> list;
 
@@ -23,30 +39,21 @@ public class TransferWatcher {
         view.setItems(list);
     }
 
-    public void watch(MessageResponsePair messageResponsePair){
-        Message message = messageResponsePair.getMessage();
-        Response response = messageResponsePair.getResponse();
-
-        if (message instanceof TransferMessage){
-            if (response.getCode() == 150){
-                addEntry(message);
-            }
-        }
-    }
-
-    private void addEntry(Message message){
+    public void addEntry(Type type, String filename, long time, int bytes){
         Platform.runLater(() -> {
-            list.add(formatMessage(message));
+            list.add(formatMessage(type, filename, time, bytes));
             view.scrollTo(list.size());
         });
     }
 
-    private String formatMessage(Message message){
-        if (message.getCommand().equals("LIST") ||
-                message.getCommand().equals("RETR")) {
-            return "[DOWNLOAD]\t" + message.getCommand() + "\t" + message.getParams();
+    private String formatMessage(Type type, String filename, long time, int bytes){
+        if (time != 0) {
+            float speed = bytes / time;
+            return String.format("%s\t%s\t%d bytes in %d ms <%.2f>bytes/ms",
+                    type, filename, bytes, time, speed);
+        } else {
+            return String.format("%s\t%s\t%d bytes in %d ms",
+                    type, filename, bytes, time);
         }
-
-        return "?";
     }
 }

@@ -15,6 +15,7 @@ import java.util.List;
 public class LocalFilesystem {
 
     private Path workingDirectory;
+    private String selectedFile;
 
     public LocalFilesystem(Path workingDirectory) {
         this.workingDirectory = workingDirectory;
@@ -30,5 +31,13 @@ public class LocalFilesystem {
 
     public void setWorkingDirectory(String workingDirectory){
         this.workingDirectory = Paths.get(workingDirectory).toAbsolutePath();
+    }
+
+    public String getSelectedFile() {
+        return selectedFile;
+    }
+
+    public void setSelectedFile(String selectedFile) {
+        this.selectedFile = selectedFile;
     }
 }

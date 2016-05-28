@@ -91,6 +91,6 @@
       </FlowPane>
       <TreeView fx:id="localFilesView" layoutX="425.0" layoutY="220.0" prefHeight="300.0" prefWidth="370.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="220.0" />
       <Button layoutX="394.0" layoutY="313.0" mnemonicParsing="false" text="&lt;--" AnchorPane.bottomAnchor="312.0" AnchorPane.leftAnchor="394.0" AnchorPane.rightAnchor="394.0" AnchorPane.topAnchor="313.0" />
-      <Button layoutX="394.0" layoutY="345.0" mnemonicParsing="false" text="--&gt;" AnchorPane.bottomAnchor="280.0" AnchorPane.leftAnchor="394.0" AnchorPane.rightAnchor="394.0" AnchorPane.topAnchor="345.0" />
+      <Button fx:id="downloadButton" disable="true" layoutX="394.0" layoutY="345.0" mnemonicParsing="false" onAction="#onDownloadButton" text="--&gt;" AnchorPane.bottomAnchor="280.0" AnchorPane.leftAnchor="394.0" AnchorPane.rightAnchor="394.0" AnchorPane.topAnchor="345.0" />
    </children>
 </AnchorPane>

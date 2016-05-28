@@ -2,15 +2,15 @@ package pl.pawkrol.academic.ftp.client.filesystem;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import pl.pawkrol.academic.ftp.client.TransferWatcher;
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.client.connection.DataConnector;
+import pl.pawkrol.academic.ftp.client.message.plain.RETRMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.LISTMessage;
 import pl.pawkrol.academic.ftp.client.message.plain.PWDMessage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -22,10 +22,12 @@ public class RemoteFilesystem {
     private CommandHandler commandHandler;
     private ConnectionManager connectionManager;
     private ObservableList<String> files = FXCollections.observableArrayList();
+    private TransferWatcher transferWatcher;
 
-    public RemoteFilesystem(ConnectionManager connectionManager){
+    public RemoteFilesystem(ConnectionManager connectionManager, TransferWatcher transferWatcher){
         this.commandHandler = connectionManager.getCommandHandler();
         this.connectionManager = connectionManager;
+        this.transferWatcher = transferWatcher;
     }
 
     public void updateWorkingDirectory(){
@@ -83,7 +85,60 @@ public class RemoteFilesystem {
         commandHandler.sendMessage(new LISTMessage(workingDirectory), null);
     }
 
-    public ObservableList<String> getFiles(){
+    public void downloadFile(String remotePath, String localPath){
+        connectionManager.getDataHandler().setConnector(new DataConnector() {
+            Socket socket;
+
+            long time;
+            int bytes = 0;
+
+            @Override
+            public void init(Socket socket) {
+                this.socket = socket;
+            }
+
+            @Override
+            public void connect() {
+                try {
+                    FileOutputStream fos = new FileOutputStream(localPath);
+                    InputStream is = socket.getInputStream();
+
+                    int c;
+                    byte[] buff = new byte[1024];
+                    final long stime = System.nanoTime();
+                    while ((c = is.read(buff)) > 0){
+                        fos.write(buff, 0, c);
+                        bytes += c;
+                    }
+                    final long etime = System.nanoTime();
+
+                    time = (etime - stime) / 1000000;
+
+                } catch (IOException e) {
+                   // e.printStackTrace();
+                } finally {
+                    if (bytes != 0){
+                        transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
+                                time, bytes);
+                    }
+                }
+            }
+
+            @Override
+            public void close() {
+                try {
+                    if (socket != null) {
+                        socket.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        commandHandler.sendMessage(new RETRMessage(remotePath), null);
+    }
+
+    public ObservableList<String> getFileList(){
         return files;
     }
 

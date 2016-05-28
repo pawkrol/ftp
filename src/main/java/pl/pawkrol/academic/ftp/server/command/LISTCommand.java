@@ -83,8 +83,9 @@ public class LISTCommand extends Command{
     }
 
     private String formatFileEntry(FTPFile file){
-        return String.format("%s\t\t\t%s%s", file.getPath(),
-                file.isPermRead() ? "r" : "-",
-                file.isPermWrite() ? "w" : "-"); //TODO: add fancy stuff
+//        return String.format("%s\t\t\t%s%s", file.getPath(),
+//                file.isPermRead() ? "r" : "-",
+//                file.isPermWrite() ? "w" : "-"); //TODO: add fancy stuff
+        return String.format("%s", file.getPath());
     }
 }

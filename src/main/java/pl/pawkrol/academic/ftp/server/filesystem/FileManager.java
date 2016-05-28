@@ -4,6 +4,7 @@ import pl.pawkrol.academic.ftp.server.Main;
 import pl.pawkrol.academic.ftp.server.db.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
@@ -79,18 +80,22 @@ public class FileManager {
         return ftpFiles;
     }
 
-    public FileReader getFileReader(String filename, User user) throws FileNotFoundException,
-            PermissionDeniedException {
+    public FileInputStream getFileInputStream(String filename, User user) throws FileNotFoundException,
+                                                        PermissionDeniedException, IsDirectoryException{
         FTPFile ftpFile = getFTPFile(filename, user);
         if (ftpFile == null){
             throw new FileNotFoundException();
+        }
+
+        if (ftpFile.isDirectory()){
+            throw new IsDirectoryException();
         }
 
         if (!canUserAccessFile(user, ftpFile)){
             throw new PermissionDeniedException("User has no permission to access file");
         }
 
-        return new FileReader(ftpFile.getFile());
+        return new FileInputStream(ftpFile.getFile());
     }
 
     public void changeDir(String dir, User user) throws NotDirectoryException,

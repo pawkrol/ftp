@@ -33,8 +33,8 @@ public abstract class TransferMessage extends Message {
         }
 
         Response response = super.execute(commandHandler);
-        commandHandler.propagate(new MessageResponsePair(this, response));
         if ((response.getCode() == 150) && (addressPortPair != null)) {
+            commandHandler.propagate(new MessageResponsePair(this, response));
             dataHandler.open(addressPortPair);
 
             response = commandHandler.fetchResponse(); //blocking, desired

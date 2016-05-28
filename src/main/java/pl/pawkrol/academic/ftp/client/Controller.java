@@ -1,6 +1,8 @@
 package pl.pawkrol.academic.ftp.client;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -10,6 +12,8 @@ import pl.pawkrol.academic.ftp.client.filesystem.RemoteFilesystem;
 import pl.pawkrol.academic.ftp.client.message.Message;
 import pl.pawkrol.academic.ftp.client.message.MessageResponsePair;
 import pl.pawkrol.academic.ftp.client.message.plain.CWDMessage;
+import pl.pawkrol.academic.ftp.client.message.plain.RETRMessage;
+import pl.pawkrol.academic.ftp.client.message.transfer.TransferMessage;
 import pl.pawkrol.academic.ftp.client.session.User;
 import pl.pawkrol.academic.ftp.common.Response;
 import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
@@ -24,7 +28,7 @@ import java.util.ResourceBundle;
 /**
  * Created by pawkrol on 4/24/16.
  */
-public class Controller implements Initializable{
+public class Controller implements Initializable, ChangeListener<TreeItem<File>> {
 
     @FXML private TreeView<File> localFilesView;
     @FXML private ListView<String> remoteFilesView;
@@ -40,18 +44,23 @@ public class Controller implements Initializable{
     @FXML private PasswordField passwordField;
 
     @FXML private Button connectButton;
+    @FXML private Button downloadButton;
 
     private boolean connected = false;
     private ConnectionManager connectionManager;
     private LocalFilesystem localFilesystem;
     private RemoteFilesystem remoteFilesystem;
+    private TransferWatcher transferWatcher;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        localFilesystem = new LocalFilesystem(Paths.get("/").toAbsolutePath());
+        localFilesystem =
+                new LocalFilesystem(Paths.get(System.getProperty("user.home")).toAbsolutePath());
         ListViewAppender.setListView(rawResponseView);
         setLocalFileListAndPath();
         localFilesView.setCellFactory(param -> new TreeCellFactory());
+        localFilesView.getSelectionModel().selectedItemProperty().addListener(this);
+        transferWatcher = new TransferWatcher(transferView);
     }
 
     @FXML
@@ -63,21 +72,16 @@ public class Controller implements Initializable{
                 if (connectionManager != null){
                     connectionManager.getCommandHandler()
                                         .registerMessageResponseListener(this::onAnyResponse);
-                    connectionManager.getCommandHandler()
-                                        .registerMessageResponseListener(
-                                                new TransferWatcher(transferView)::watch
-                                        );
-                    remoteFilesystem = new RemoteFilesystem(connectionManager);
+                    remoteFilesystem = new RemoteFilesystem(connectionManager, transferWatcher);
                     connectionManager.open();
                 }
 
                 connected = true;
                 connectButton.setText("Disconnect");
-                remoteDirField.setDisable(false);
-                remoteFilesView.setDisable(false);
+                setUIEnabled(true);
 
             } catch (IOException e) {
-                createWarningDialog("Connection error", "Cannot setConnector to the remote host");
+                createWarningDialog("Connection error", "Cannot connect to the remote host");
             } catch (EmptyFiledException e){
                 //Do nothing
             }
@@ -98,6 +102,21 @@ public class Controller implements Initializable{
                 .sendMessage(new CWDMessage(remoteDirField.getText()), null);
     }
 
+    @FXML
+    public void onDownloadButton(){
+        String remoteFile = remoteFilesView.getSelectionModel().getSelectedItem();
+        if (remoteFile == null) {
+            Platform.runLater( () ->
+                createWarningDialog("File not selected", "Please select file to download")
+            );
+        } else {
+            String localFile = localFilesystem.getWorkingDirectory().toString();
+            localFile += (localFile.endsWith("/") ? "" : "/")
+                        + getRemoteFilename(remoteFile);
+            remoteFilesystem.downloadFile(remoteFile, localFile);
+        }
+    }
+
     public ConnectionManager getConnectionManager() {
         return connectionManager;
     }
@@ -109,6 +128,12 @@ public class Controller implements Initializable{
         if (response.getCode() == 426){
             disconnect();
             return;
+        }
+
+        if (message instanceof TransferMessage){
+            if (response.getCode() == 226){
+                Platform.runLater(this::setLocalFileListAndPath);
+            }
         }
 
         switch (message.getCommand()){
@@ -137,6 +162,20 @@ public class Controller implements Initializable{
                     );
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void changed(ObservableValue<? extends TreeItem<File>> observable,
+                        TreeItem<File> oldValue, TreeItem<File> newValue) {
+        if (newValue == null) return;
+        File file = newValue.getValue();
+
+        if (file.isDirectory()) {
+            localFilesystem.setWorkingDirectory(file.getPath());
+            localDirField.setText(localFilesystem.getWorkingDirectory().toString());
+        } else {
+            localFilesystem.setSelectedFile(file.getPath());
         }
     }
 
@@ -177,7 +216,7 @@ public class Controller implements Initializable{
 
     private void setRemoteFileList(){
         Platform.runLater(() ->
-                remoteFilesView.setItems(remoteFilesystem.getFiles())
+                remoteFilesView.setItems(remoteFilesystem.getFileList())
         );
     }
 
@@ -187,9 +226,20 @@ public class Controller implements Initializable{
 
             connected = false;
             connectButton.setText("Connect");
-            remoteDirField.setDisable(true);
-            remoteFilesView.setDisable(true);
+            setUIEnabled(false);
         });
+    }
+
+    private void setUIEnabled(boolean enabled){
+        enabled = !enabled;
+
+        remoteDirField.setDisable(enabled);
+        remoteFilesView.setDisable(enabled);
+        downloadButton.setDisable(enabled);
+    }
+
+    private String getRemoteFilename(String remotePath){
+        return Paths.get(remotePath).getFileName().toString();
     }
 
     private boolean validate(TextField textField){
