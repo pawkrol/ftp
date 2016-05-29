@@ -22,6 +22,7 @@ import pl.pawkrol.academic.ftp.common.utils.LogWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -204,6 +205,17 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
                     }
                 });
 
+    }
+
+    @FXML
+    public void onGoUp(){
+        Path pathParent = localFilesystem.getWorkingDirectory().getParent();
+        if (pathParent == null) {
+            return;
+        }
+
+        localFilesystem.setWorkingDirectory(pathParent);
+        Platform.runLater(this::setLocalFileListAndPath);
     }
 
     public ConnectionManager getConnectionManager() {

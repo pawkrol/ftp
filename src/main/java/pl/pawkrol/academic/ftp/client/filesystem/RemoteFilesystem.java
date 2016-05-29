@@ -17,6 +17,8 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Collator;
+import java.util.Collections;
 
 /**
  * Created by pawkrol on 5/26/16.
@@ -75,9 +77,6 @@ public class RemoteFilesystem {
                     );
 
                     files = FXCollections.observableArrayList();
-                    if (!workingDirectory.equals("/")){
-                        files.add("..");
-                    }
                     String line;
                     while ((line = reader.readLine()) != null){
                         files.add(line);
@@ -219,6 +218,10 @@ public class RemoteFilesystem {
     }
 
     public ObservableList<String> getFileList(){
+        Collections.sort(files, Collator.getInstance());
+        if (!workingDirectory.equals("/")){
+            files.add(0, "..");
+        }
         return files;
     }
 

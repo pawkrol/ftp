@@ -86,7 +86,16 @@
                   <Insets right="10.0" />
                </padding>
             </Label>
-            <TextField fx:id="localDirField" onAction="#onEnterLocalDirField" prefHeight="25.0" prefWidth="290.0" />
+            <TextField fx:id="localDirField" onAction="#onEnterLocalDirField" prefHeight="25.0" prefWidth="285.0" />
+            <Button mnemonicParsing="false" onAction="#onGoUp">
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0">
+                     <image>
+                        <Image url="icos/goUpIco.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
          </children>
       </FlowPane>
       <TreeView fx:id="localFilesView" layoutX="425.0" layoutY="220.0" prefHeight="300.0" prefWidth="370.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="220.0" />
@@ -96,7 +105,7 @@
          <graphic>
             <ImageView disable="true" fitHeight="16.0" fitWidth="16.0">
                <image>
-                  <Image url="addDirIco.png" />
+                  <Image url="icos/addDirIco.png" />
                </image>
             </ImageView>
          </graphic>
@@ -105,7 +114,7 @@
          <graphic>
             <ImageView fitHeight="16.0" fitWidth="16.0">
                <image>
-                  <Image url="removeIco.png" />
+                  <Image url="icos/removeIco.png" />
                </image>
             </ImageView>
          </graphic>
@@ -114,7 +123,16 @@
          <graphic>
             <ImageView disable="true" fitHeight="16.0" fitWidth="16.0">
                <image>
-                  <Image url="addDirIco.png" />
+                  <Image url="icos/addDirIco.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="494.0" layoutY="520.0" mnemonicParsing="false" onAction="#onLocalRemove">
+         <graphic>
+            <ImageView fitHeight="16.0" fitWidth="16.0">
+               <image>
+                  <Image url="icos/removeIco.png" />
                </image>
             </ImageView>
          </graphic>

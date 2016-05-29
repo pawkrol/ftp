@@ -32,7 +32,7 @@ public class RMDCommand extends Command{
             return new Response(550, "Cannot delete \"" + params[0] + "\"");
         }
 
-        return new Response(250, params[0] + "\" deleted");
+        return new Response(250, "\"" + params[0] + "\" deleted");
     }
 
 }

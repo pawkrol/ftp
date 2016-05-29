@@ -97,6 +97,9 @@ public class CommandHandler{
                 propagate(new MessageResponsePair(message, response));
             } catch (IOException e) {
                 e.printStackTrace();
+                if (socket.isClosed()){
+                    connectionManager.close();
+                }
             }
         });
     }
