@@ -87,8 +87,13 @@ public class CommandHandler implements Runnable{
     }
 
     private void handleClose() {
-        log.log(Level.INFO, "End of connection from: "
-                + socket.getInetAddress().getCanonicalHostName());
+        if (session.getUser() != null) {
+            log.log(Level.INFO, "End of connection from: " + session.getUser().getUsername()
+                    + "@" + socket.getInetAddress().getCanonicalHostName());
+        } else {
+            log.log(Level.INFO, "End of connection from: "
+                    + socket.getInetAddress().getCanonicalHostName());
+        }
         session.close();
 
         try {

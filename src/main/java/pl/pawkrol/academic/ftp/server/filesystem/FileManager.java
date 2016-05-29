@@ -60,12 +60,7 @@ public class FileManager {
                 return null;
             }
 
-            User fileUser;
-            if ( (fileUser = userRepository.getUserById(dbFile.getUserId())) == null){
-                return null;
-            }
-
-            ftpFile = new FTPFile(file, fileUser, dbFile.getPath(), dbFile.isPermRead(),
+            ftpFile = new FTPFile(file, user, dbFile.getPath(), dbFile.isPermRead(),
                                     dbFile.isPermWrite(), file.isDirectory());
 
         } catch (SQLException e) {
@@ -91,7 +86,7 @@ public class FileManager {
             }
 
             for (DBFile dbFile : dbFiles){
-                ftpFiles.add(getFTPFile(dbFile.getPath(), user));
+                ftpFiles.add(makeFTPFile(dbFile, file, user));
             }
 
         } catch (SQLException e) {
@@ -119,7 +114,7 @@ public class FileManager {
         return new FileInputStream(ftpFile.getFile());
     }
 
-    public void changeDir(String dir, User user) throws NotDirectoryException,
+    public String changeDir(String dir, User user) throws NotDirectoryException,
                                                     FileDoesNotExistsException{
         if (!dir.equals("/")) {
             FTPFile file = getFTPFile(dir, user);
@@ -131,24 +126,25 @@ public class FileManager {
         }
 
         this.currentDir = dir;
+
+        return dir;
     }
 
     public String getCurrentDir(){
         return currentDir;
     }
 
+    public String constructFilePath(String filename, User user){
+        return Paths.get(Main.rootPath.toString(), user.getUsername(), filename).toString();
+    }
+
+    private FTPFile makeFTPFile(DBFile dbFile, File file, User user) throws SQLException {
+        return new FTPFile(file, user, dbFile.getPath(), dbFile.isPermRead(),
+                            dbFile.isPermWrite(), file.isDirectory());
+    }
+
     private boolean canUserAccessFile(User user, FTPFile ftpFile){
         return ftpFile.getUser() == null || (ftpFile.getUser().equals(user)
                 && ftpFile.isPermRead());
-    }
-
-    public String constructFilePath(String filename, User user){
-        String fileDir = Main.rootPath.toString() + "/"
-                + user.getUsername() + "/" + currentDir;
-        if (currentDir.endsWith("/")){
-            return fileDir + filename;
-        } else {
-            return fileDir + "/" + filename;
-        }
     }
 }

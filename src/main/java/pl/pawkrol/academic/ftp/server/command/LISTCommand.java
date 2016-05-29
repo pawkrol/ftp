@@ -59,6 +59,12 @@ public class LISTCommand extends Command{
                         session.getDataHandler().close();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        try {
+                            session.getCommandHandler()
+                                    .sendResponse(new Response(451, "Something went wrong..."));
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 }
 

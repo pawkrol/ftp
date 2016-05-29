@@ -164,6 +164,7 @@ public class RemoteFilesystem {
 
             long time;
             int bytes = 0;
+            long stime;
 
             @Override
             public void init(Socket socket) {
@@ -178,21 +179,20 @@ public class RemoteFilesystem {
 
                     int c;
                     byte[] buff = new byte[1024];
-                    final long stime = System.nanoTime();
+                    stime = System.nanoTime();
                     while ((c = is.read(buff)) > 0){
                         fos.write(buff, 0, c);
                         bytes += c;
                     }
-                    final long etime = System.nanoTime();
-
-                    time = (etime - stime) / 1000000;
-
-                    transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
-                            time, bytes);
                 } catch (IOException e) {
                    // e.printStackTrace();
                 } finally {
                     close();
+
+                    long etime = System.nanoTime();
+                    time = (etime - stime) / 1000000;
+                    transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
+                            time, bytes);
                 }
             }
 

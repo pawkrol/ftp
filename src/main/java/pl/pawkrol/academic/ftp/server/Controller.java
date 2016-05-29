@@ -78,8 +78,14 @@ public class Controller implements Initializable{
             User user = new User(login, password);
 
             try {
-                new UserCreator(connectionManager.getDbConnector())
-                        .create(user);
+                final Logger log = LogManager.getLogger("logger");
+                if ( new UserCreator(connectionManager.getDbConnector())
+                        .create(user)){
+                    log.log(Level.INFO, user + " created");
+                } else {
+                    log.log(Level.ERROR, "Cannot create " + user);
+                }
+
                 loginUserField.clear();
                 passwordUserField.clear();
             } catch (SQLException e) {

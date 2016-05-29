@@ -31,8 +31,8 @@ public class PassiveDataHandler extends DataHandler {
         try {
             while (running) {
                 Socket socket = serverSocket.accept();
-                log.log(Level.INFO, "Passive connection with: "
-                                + socket.getInetAddress().getCanonicalHostName());
+                log.log(Level.INFO, "Passive connection with: " + session.getUser().getUsername()
+                                + "@" + socket.getInetAddress().getCanonicalHostName());
 
                 if (dataProcessor == null){
                     session.getCommandHandler().sendResponse(new Response(426, "Connection broken"));

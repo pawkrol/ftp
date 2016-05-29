@@ -22,8 +22,8 @@ public class CWDCommand extends Command{
         }
 
         try {
-            session.getFileManager().changeDir(params[0], session.getUser());
-            return new Response(250, "CWD command successful");
+            String dir = session.getFileManager().changeDir(params[0], session.getUser());
+            return new Response(250, "Changed directory to \"" + dir + "\"");
         } catch (NotDirectoryException e) {
             return new Response(550, params[0] + " is not directory");
         } catch (FileDoesNotExistsException e) {

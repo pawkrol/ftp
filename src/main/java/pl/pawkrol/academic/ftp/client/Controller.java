@@ -3,6 +3,7 @@ package pl.pawkrol.academic.ftp.client;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -341,6 +342,10 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
     private void disconnect(){
         Platform.runLater(() -> {
             connectionManager.close();
+
+            remoteDirField.clear();
+            remoteFilesView.setItems(FXCollections.emptyObservableList());
+            transferView.setItems(FXCollections.emptyObservableList());
 
             connected = false;
             connectButton.setText("Connect");
