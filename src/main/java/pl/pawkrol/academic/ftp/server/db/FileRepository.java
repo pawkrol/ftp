@@ -28,12 +28,13 @@ public class FileRepository {
         this.dbConnector = dbConnector;
     }
 
-    public synchronized void removeFileRecord(String filename) throws SQLException{
+    public synchronized void removeFileRecord(String filename, User user) throws SQLException{
         Connection connection = dbConnector.makeConnection();
         Statement statement = connection.createStatement();
 
         String query = "DELETE FROM " + TABLE_NAME + " WHERE "
-                            + FILENAME + "=\"" + filename + "\"";
+                            + FILENAME + "=\"" + filename + "\""
+                            + " AND " + OWNER_ID + "=" + user.getUserId();
         statement.executeUpdate(query);
 
         connection.close();
@@ -56,7 +57,7 @@ public class FileRepository {
         statement.close();
     }
 
-    public synchronized DBFile getFileByFilename(String filename) throws SQLException {
+    public synchronized DBFile getFileByFilename(String filename, User user) throws SQLException {
         Connection connection = dbConnector.makeConnection();
         Statement statement = connection.createStatement();
 
@@ -64,7 +65,9 @@ public class FileRepository {
 
         String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
                          PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
-                            " FROM " + TABLE_NAME + " WHERE " + FILENAME + " = \"" + filename + "\"";
+                            " FROM " + TABLE_NAME +
+                            " WHERE " + FILENAME + " = \"" + filename +
+                            "\" AND " + OWNER_ID + " = " + user.getUserId();
 
         ResultSet resultSet = statement.executeQuery(query);
 
@@ -78,7 +81,7 @@ public class FileRepository {
         return dbFile;
     }
 
-    public synchronized List<DBFile> getFilesFromDirectory(String dir) throws SQLException{
+    public synchronized List<DBFile> getFilesFromDirectory(String dir, User user) throws SQLException{
         Connection connection = dbConnector.makeConnection();
         Statement statement = connection.createStatement();
 
@@ -87,7 +90,7 @@ public class FileRepository {
         String query = "SELECT " + FILE_ID + ", " + FILENAME + ", " +
                             PERM_WRITE + ", " + PERM_READ + ", " + OWNER_ID +
                             " FROM " + TABLE_NAME + " WHERE " + FILENAME +
-                            " LIKE \"" + dir + "%\"";
+                            " LIKE \"" + dir + "%\" AND " + OWNER_ID + "=" + user.getUserId();
 
         ResultSet resultSet = statement.executeQuery(query);
 

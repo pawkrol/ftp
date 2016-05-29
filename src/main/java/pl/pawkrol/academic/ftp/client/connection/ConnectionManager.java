@@ -3,7 +3,7 @@ package pl.pawkrol.academic.ftp.client.connection;
 import pl.pawkrol.academic.ftp.client.RawResponseDispatcher;
 import pl.pawkrol.academic.ftp.client.message.plain.QUITMessage;
 import pl.pawkrol.academic.ftp.client.session.Session;
-import pl.pawkrol.academic.ftp.client.session.User;
+import pl.pawkrol.academic.ftp.common.User;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -2,6 +2,7 @@ package pl.pawkrol.academic.ftp.client.session;
 
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.message.AUTHMessage;
+import pl.pawkrol.academic.ftp.common.User;
 
 /**
  * Created by pawkrol on 5/15/16.

@@ -12,10 +12,8 @@ import pl.pawkrol.academic.ftp.client.filesystem.LocalFilesystem;
 import pl.pawkrol.academic.ftp.client.filesystem.RemoteFilesystem;
 import pl.pawkrol.academic.ftp.client.message.Message;
 import pl.pawkrol.academic.ftp.client.message.MessageResponsePair;
-import pl.pawkrol.academic.ftp.client.message.plain.CWDMessage;
-import pl.pawkrol.academic.ftp.client.message.transfer.TransferMessage;
-import pl.pawkrol.academic.ftp.client.session.User;
 import pl.pawkrol.academic.ftp.common.Response;
+import pl.pawkrol.academic.ftp.common.User;
 import pl.pawkrol.academic.ftp.common.utils.ListViewAppender;
 import pl.pawkrol.academic.ftp.common.utils.LogWrapper;
 
@@ -146,9 +144,17 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
         if (filepath.isEmpty()){
             createWarningDialog(Alert.AlertType.ERROR, "File not selected",
                                     "Please select file to upload");
-        } else {
-            remoteFilesystem.uploadFile(filepath);
+            return;
         }
+
+        File file = new File(filepath);
+        if (file.isDirectory()){
+            createWarningDialog(Alert.AlertType.ERROR, "File is directory",
+                    "Cannot upload directory");
+            return;
+        }
+
+        remoteFilesystem.uploadFile(filepath);
     }
 
     @FXML

@@ -3,6 +3,7 @@ package pl.pawkrol.academic.ftp.client.session;
 import pl.pawkrol.academic.ftp.client.connection.CommandHandler;
 import pl.pawkrol.academic.ftp.client.connection.ConnectionManager;
 import pl.pawkrol.academic.ftp.client.connection.DataHandler;
+import pl.pawkrol.academic.ftp.common.User;
 
 /**
  * Created by pawkrol on 4/25/16.

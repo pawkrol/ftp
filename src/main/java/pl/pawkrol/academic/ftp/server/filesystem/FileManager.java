@@ -30,7 +30,7 @@ public class FileManager {
     public synchronized boolean removeFile(String filename, User user) throws SQLException{
         File file = new File(constructFilePath(filename, user));
         if (!file.isDirectory()) {
-            fileRepository.removeFileRecord(filename);
+            fileRepository.removeFileRecord(filename, user);
             return file.delete();
         } else {
             return false;
@@ -38,7 +38,7 @@ public class FileManager {
     }
 
     public synchronized void removeDirectory(String filename, User user) throws SQLException, IOException {
-        fileRepository.removeFileRecord(filename);
+        fileRepository.removeFileRecord(filename, user);
         File file = new File(constructFilePath(filename, user));
         FileUtils.deleteDirectory(file);
     }
@@ -52,7 +52,7 @@ public class FileManager {
     public synchronized FTPFile getFTPFile(String filename, User user){
         FTPFile ftpFile = null;
         try {
-            DBFile dbFile = fileRepository.getFileByFilename(filename);
+            DBFile dbFile = fileRepository.getFileByFilename(filename, user);
             Path path = Paths.get(Main.rootPath.toString(), user.getUsername(), filename);
             File file = new File(path.toString());
 
@@ -85,7 +85,7 @@ public class FileManager {
         List<FTPFile> ftpFiles = new LinkedList<>();
 
         try {
-            List<DBFile> dbFiles = fileRepository.getFilesFromDirectory(dir);
+            List<DBFile> dbFiles = fileRepository.getFilesFromDirectory(dir, user);
             if (dbFiles.isEmpty()){
                 throw new FileNotFoundException();
             }

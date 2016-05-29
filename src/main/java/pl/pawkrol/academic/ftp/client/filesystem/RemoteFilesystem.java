@@ -10,12 +10,9 @@ import pl.pawkrol.academic.ftp.client.message.plain.*;
 import pl.pawkrol.academic.ftp.client.message.transfer.RETRMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.LISTMessage;
 import pl.pawkrol.academic.ftp.client.message.transfer.STORMessage;
-import pl.pawkrol.academic.ftp.client.session.User;
-import pl.pawkrol.academic.ftp.server.Main;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Collator;
 import java.util.Collections;
