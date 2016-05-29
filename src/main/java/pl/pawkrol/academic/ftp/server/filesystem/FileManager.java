@@ -1,10 +1,9 @@
 package pl.pawkrol.academic.ftp.server.filesystem;
 
 import org.apache.commons.io.FileUtils;
-import pl.pawkrol.academic.ftp.client.session.*;
 import pl.pawkrol.academic.ftp.server.Main;
 import pl.pawkrol.academic.ftp.server.db.*;
-import pl.pawkrol.academic.ftp.server.db.User;
+import pl.pawkrol.academic.ftp.common.User;
 
 import java.io.*;
 import java.nio.file.Path;

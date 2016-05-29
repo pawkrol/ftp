@@ -1,7 +1,7 @@
 package pl.pawkrol.academic.ftp.server.session;
 
 import pl.pawkrol.academic.ftp.server.connection.*;
-import pl.pawkrol.academic.ftp.server.db.User;
+import pl.pawkrol.academic.ftp.common.User;
 import pl.pawkrol.academic.ftp.server.filesystem.FileManager;
 
 /**

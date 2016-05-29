@@ -1,9 +1,8 @@
 package pl.pawkrol.academic.ftp.server.filesystem;
 
-import pl.pawkrol.academic.ftp.server.db.User;
+import pl.pawkrol.academic.ftp.common.User;
 
 import java.io.File;
-import java.nio.file.Path;
 
 /**
  * Created by pawkrol on 4/24/16.

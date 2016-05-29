@@ -1,4 +1,4 @@
-package pl.pawkrol.academic.ftp.server.db;
+package pl.pawkrol.academic.ftp.common;
 
 
 /**
@@ -11,6 +11,12 @@ public class User {
     private String password;
 
     public User(){}
+
+    public User(String username, String password) {
+        this.userId = -1;
+        this.username = username;
+        this.password = password;
+    }
 
     public User(int userId, String username, String password) {
         this.userId = userId;

@@ -1,5 +1,7 @@
 package pl.pawkrol.academic.ftp.server.db;
 
+import pl.pawkrol.academic.ftp.common.User;
+
 import java.sql.*;
 
 /**
