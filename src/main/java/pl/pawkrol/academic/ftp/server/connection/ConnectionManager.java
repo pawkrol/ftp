@@ -1,7 +1,6 @@
 package pl.pawkrol.academic.ftp.server.connection;
 
 import pl.pawkrol.academic.ftp.server.db.DBConnector;
-import pl.pawkrol.academic.ftp.server.filesystem.FileManager;
 import pl.pawkrol.academic.ftp.server.session.Session;
 import pl.pawkrol.academic.ftp.server.session.SessionManager;
 
@@ -18,12 +17,14 @@ public class ConnectionManager {
     private final int port;
     private final int pool;
     private final SessionManager sessionManager;
+    private final DBConnector dbConnector;
 
     private ExecutorService executorService;
     private ServerSocket serverSocket;
 
     public ConnectionManager(int port, int pool, DBConnector dbConnector){
         this.sessionManager = new SessionManager(this, dbConnector);
+        this.dbConnector = dbConnector;
         this.port = port;
         this.pool = pool;
     }
@@ -81,6 +82,10 @@ public class ConnectionManager {
         }
 
         return null;
+    }
+
+    public DBConnector getDbConnector() {
+        return dbConnector;
     }
 
     public int getPort(){

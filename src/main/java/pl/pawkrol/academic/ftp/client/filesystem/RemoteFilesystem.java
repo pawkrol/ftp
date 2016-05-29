@@ -135,14 +135,12 @@ public class RemoteFilesystem {
 
                     time = (etime - stime) / 1000000;
 
+                    transferWatcher.addEntry(TransferWatcher.Type.UPLOAD, filename,
+                            time, bytes);
                 } catch (IOException e) {
                    // e.printStackTrace();
                 } finally {
                     close();
-                    if (bytes != 0){
-                        transferWatcher.addEntry(TransferWatcher.Type.UPLOAD, filename,
-                                time, bytes);
-                    }
                 }
             }
 
@@ -189,14 +187,12 @@ public class RemoteFilesystem {
 
                     time = (etime - stime) / 1000000;
 
+                    transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
+                            time, bytes);
                 } catch (IOException e) {
                    // e.printStackTrace();
                 } finally {
                     close();
-                    if (bytes != 0){
-                        transferWatcher.addEntry(TransferWatcher.Type.DOWNLOAD, remotePath,
-                                time, bytes);
-                    }
                 }
             }
 

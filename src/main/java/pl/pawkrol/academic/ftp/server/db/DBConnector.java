@@ -14,12 +14,13 @@ public class DBConnector {
     private final String USERNAME = "ftp-server";
     private final String PASSWORD = "ftp-password";
 
-    public DBConnector(){
-        try {
-            Class.forName(JDBC_DRIVER);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private final FileRepository fileRepository;
+    private final UserRepository userRepository;
+
+    public DBConnector() throws ClassNotFoundException {
+        Class.forName(JDBC_DRIVER);
+        fileRepository = new FileRepository(this);
+        userRepository = new UserRepository(this);
     }
 
     public synchronized Connection makeConnection() throws SQLException {
@@ -27,10 +28,10 @@ public class DBConnector {
     }
 
     public synchronized FileRepository requestFileRepository(){
-        return new FileRepository(this);
+        return fileRepository;
     }
 
     public synchronized UserRepository requestUserRepository(){
-        return new UserRepository(this);
+        return userRepository;
     }
 }

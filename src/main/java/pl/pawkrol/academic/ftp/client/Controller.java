@@ -363,6 +363,8 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
         return Paths.get(remotePath).getFileName().toString();
     }
 
+
+    @SuppressWarnings("Duplicates")
     private boolean validate(TextField textField){
         if (textField.getText().isEmpty()){
             textField.setStyle("-fx-background-color: #F7D5D5;" +

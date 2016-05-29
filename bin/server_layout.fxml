@@ -7,11 +7,18 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="400.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.server.Controller">
+<AnchorPane id="AnchorPane" prefHeight="280.0" prefWidth="400.0" snapToPixel="true" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pawkrol.academic.ftp.server.Controller">
   <children>
       <Button fx:id="button" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClickButton" text="Start" />
       <Label layoutX="290.0" layoutY="12.0" text="Server at port: " />
       <Label fx:id="portLabel" layoutX="290.0" layoutY="32.0" text="null" />
       <ListView fx:id="logger" layoutX="10.0" layoutY="50.0" prefHeight="140.0" prefWidth="380.0" />
+      <Label layoutX="10.0" layoutY="246.0" text="login" />
+      <TextField fx:id="loginUserField" layoutX="60.0" layoutY="241.0" onAction="#onAddUser" prefHeight="25.0" prefWidth="80.0" />
+      <Label fx:id="portLabel1" layoutX="170.0" layoutY="246.0" text="password" />
+      <PasswordField fx:id="passwordUserField" layoutX="238.0" layoutY="241.0" onAction="#onAddUser" prefHeight="25.0" prefWidth="90.0" />
+      <Label layoutX="171.0" layoutY="216.0" text="Add user" />
+      <Separator layoutX="25.0" layoutY="204.0" prefWidth="350.0" />
+      <Button layoutX="340.0" layoutY="241.0" mnemonicParsing="false" onAction="#onAddUser" text="Add" />
   </children>
 </AnchorPane>
