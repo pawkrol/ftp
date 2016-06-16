@@ -42,8 +42,14 @@ public class TransferWatcher {
     public void addEntry(Type type, String filename, long time, int bytes){
         Platform.runLater(() -> {
             list.add(formatMessage(type, filename, time, bytes));
+            view.setItems(list);
             view.scrollTo(list.size());
         });
+    }
+
+    public void clear(){
+        list.clear();
+        Platform.runLater(() -> view.setItems(FXCollections.emptyObservableList()));
     }
 
     private String formatMessage(Type type, String filename, long time, int bytes){

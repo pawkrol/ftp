@@ -205,9 +205,9 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
                 .ifPresent(buttonType -> {
                     if (buttonType == ButtonType.OK) {
                         localFilesystem.remove(filename);
-                        localFilesystem.setWorkingDirectory(
-                                localFilesystem.getWorkingDirectory().getParent()
-                        );
+//                        localFilesystem.setWorkingDirectory(
+//                                localFilesystem.getWorkingDirectory().getParent()
+//                        );
                         Platform.runLater(this::setLocalFileListAndPath);
                     }
                 });
@@ -345,7 +345,7 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
 
             remoteDirField.clear();
             remoteFilesView.setItems(FXCollections.emptyObservableList());
-            transferView.setItems(FXCollections.emptyObservableList());
+            transferWatcher.clear();
 
             connected = false;
             connectButton.setText("Connect");
@@ -362,6 +362,7 @@ public class Controller implements Initializable, ChangeListener<TreeItem<File>>
         uploadButton.setDisable(enabled);
         addRemoteDirButton.setDisable(enabled);
         removeRemoteDirButton.setDisable(enabled);
+        transferView.setDisable(enabled);
     }
 
     private String getRemoteFilename(String remotePath){
